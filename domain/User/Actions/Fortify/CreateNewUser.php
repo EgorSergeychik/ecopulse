@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Actions\Fortify;
+namespace Domain\User\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
-use App\Models\User;
+use Domain\User\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
