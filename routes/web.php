@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\Enums\Permission;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -9,6 +10,10 @@ Route::inertia('/', 'Welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+});
+
+Route::group(['prefix' => 'users', 'middleware' => ['auth', 'verified']], function () {
+    Route::inertia('/', 'Users')->can(Permission::ManageUsers)->name('users.index');
 });
 
 require __DIR__.'/settings.php';

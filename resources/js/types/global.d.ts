@@ -29,5 +29,6 @@ declare module 'vue' {
         $inertia: typeof Router;
         $page: Page;
         $headManager: ReturnType<typeof createHeadManager>;
+        $can: (permission: string) => boolean;
     }
 }

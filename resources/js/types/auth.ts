@@ -1,3 +1,5 @@
+import type { Permission } from '@/types/permissions';
+
 export type User = {
     id: number;
     name: string;
@@ -20,6 +22,4 @@ export type TwoFactorConfigContent = {
     buttonText: string;
 };
 
-export type Permissions = {
-    [key: string]: boolean;
-};
+export type Permissions = Record<Permission, boolean>;
