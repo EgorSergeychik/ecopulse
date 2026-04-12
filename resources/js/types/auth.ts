@@ -11,10 +11,15 @@ export type User = {
 
 export type Auth = {
     user: User;
+    permissions: Permissions;
 };
 
 export type TwoFactorConfigContent = {
     title: string;
     description: string;
     buttonText: string;
+};
+
+export type Permissions = {
+    [key: string]: boolean;
 };
