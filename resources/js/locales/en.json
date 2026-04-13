@@ -15,6 +15,52 @@
             "cancel": "Cancel"
         }
     },
+    "navigation": {
+        "main": {
+            "dashboard": "Dashboard",
+            "users": "Users"
+        },
+        "footer": {
+            "repository": "Repository"
+        }
+    },
+    "pages": {
+        "dashboard": {
+            "title": "Dashboard"
+        },
+        "users": {
+            "title": "Users",
+            "description": "Manage service users",
+            "header": {
+                "buttons": {
+                    "create": "Add User"
+                }
+            },
+            "table": {
+                "columns": {
+                    "name": "Name",
+                    "email": "Email",
+                    "actions": "Actions",
+                    "created_at": "Created At"
+                },
+                "empty": "No users to display"
+            },
+            "modal": {
+                "title": {
+                    "create": "Create User",
+                    "edit": "Edit User"
+                },
+                "fields": {
+                    "name": "Name",
+                    "email": "Email"
+                }
+            }
+        }
+    },
+    "user_context": {
+        "settings": "Settings",
+        "logout": "Logout"
+    },
     "settings": {
         "head": "Settings",
         "description": "Manage your account settings",
@@ -96,6 +142,5 @@
     },
     "header": {
         "title": "Application"
-    },
-    "test": "test"
+    }
 }

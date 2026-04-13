@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { Pencil, Plus, Trash } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import UserFormModal from '@/components/users/UserFormModal.vue';
@@ -13,11 +14,13 @@ defineProps<{
     users: any;
 }>();
 
+const { t } = useI18n();
+
 defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Users',
+                title: 'pages.users.title',
                 href: usersIndex(),
             },
         ],
@@ -47,17 +50,17 @@ const deleteUser = (user: any) => {
 </script>
 
 <template>
-    <Head title="Users" />
+    <Head :title="t('pages.users.title')" />
 
     <div class="space-y-6 p-6">
         <div class="flex items-center justify-between">
             <Heading
-                title="Users"
-                description="Manage your application users and their roles."
+                :title="t('pages.users.title')"
+                :description="t('pages.users.description')"
             />
             <Button @click="openCreateModal" v-if="can(Permission.CreateUsers)">
                 <Plus class="mr-2 h-4 w-4" />
-                Add User
+                {{ t('pages.users.header.buttons.create') }}
             </Button>
         </div>
 
@@ -71,17 +74,17 @@ const deleteUser = (user: any) => {
                             <th
                                 class="h-12 px-4 text-left align-middle font-medium text-muted-foreground"
                             >
-                                Name
+                                {{ t('pages.users.table.columns.name') }}
                             </th>
                             <th
                                 class="h-12 px-4 text-left align-middle font-medium text-muted-foreground"
                             >
-                                Email
+                                {{ t('pages.users.table.columns.email') }}
                             </th>
                             <th
                                 class="h-12 px-4 text-right align-middle font-medium text-muted-foreground"
                             >
-                                Actions
+                                {{ t('pages.users.table.columns.actions') }}
                             </th>
                         </tr>
                     </thead>
@@ -117,7 +120,7 @@ const deleteUser = (user: any) => {
                                 colspan="3"
                                 class="p-8 text-center text-muted-foreground"
                             >
-                                No users found.
+                                {{ t('pages.users.table.empty') }}
                             </td>
                         </tr>
                     </tbody>
@@ -125,7 +128,7 @@ const deleteUser = (user: any) => {
             </div>
         </div>
 
-        <!-- Pagination (Simple example) -->
+        <!-- Pagination -->
         <div
             v-if="users.links && users.links.length > 3"
             class="flex items-center justify-end space-x-2 py-4"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -22,6 +23,8 @@ const { can } = usePermission();
 const filteredItems = computed(() => {
     return props.items.filter((item) => !item.permission || can(item.permission));
 });
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -32,11 +35,11 @@ const filteredItems = computed(() => {
                 <SidebarMenuButton
                     as-child
                     :is-active="isCurrentUrl(item.href)"
-                    :tooltip="item.title"
+                    :tooltip="t(item.title)"
                 >
                     <Link :href="item.href">
                         <component :is="item.icon" v-if="item.icon" />
-                        <span>{{ item.title }}</span>
+                        <span>{{ t(item.title) }}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

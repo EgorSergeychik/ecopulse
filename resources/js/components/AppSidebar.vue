@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Users } from 'lucide-vue-next';
+import { FolderGit2, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -21,12 +21,12 @@ import { Permission } from '@/types/permissions';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'pages.dashboard.title',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'Users',
+        title: 'pages.users.title',
         href: users(),
         icon: Users,
         permission: Permission.ViewUsers,
@@ -35,14 +35,9 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
+        title: 'navigation.footer.repository',
+        href: 'https://github.com/EgorSergeychik/ecopulse',
         icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
     },
 ];
 </script>

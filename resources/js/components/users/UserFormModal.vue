@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -18,6 +19,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['update:open']);
+
+const { t } = useI18n();
 
 const form = useForm({
     name: props.user ? props.user.name : '',
@@ -56,17 +59,17 @@ const submit = () => {
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>{{
-                    user ? 'Редагувати користувача' : 'Створити користувача'
+                    user ? t('pages.users.modal.title.edit') : t('pages.users.modal.title.create')
                 }}</DialogTitle>
             </DialogHeader>
             <form @submit.prevent="submit" class="space-y-4">
                 <div class="space-y-2">
-                    <Label for="name">Ім'я</Label>
+                    <Label for="name">{{ t('pages.users.modal.fields.name') }}</Label>
                     <Input id="name" v-model="form.name" />
                     <InputError :message="form.errors.name" />
                 </div>
                 <div class="space-y-2">
-                    <Label for="email">Email</Label>
+                    <Label for="email">{{ t('pages.users.modal.fields.email') }}</Label>
                     <Input id="email" type="email" v-model="form.email" />
                     <InputError :message="form.errors.email" />
                 </div>
@@ -75,10 +78,10 @@ const submit = () => {
                         type="button"
                         variant="outline"
                         @click="emit('update:open', false)"
-                        >Скасувати</Button
+                        >{{ t('common.buttons.cancel') }}</Button
                     >
                     <Button type="submit" :disabled="form.processing"
-                        >Зберегти</Button
+                        >{{ t('common.buttons.save') }}</Button
                     >
                 </DialogFooter>
             </form>
