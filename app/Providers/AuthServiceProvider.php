@@ -15,8 +15,14 @@ class AuthServiceProvider extends ServiceProvider
     ];
 
     protected $gates = [
+        // Dashboard
         Permission::ViewDashboard->value => ['gate' => GlobalGate::class, 'method' => 'viewDashboard'],
-        Permission::ManageUsers->value => ['gate' => GlobalGate::class, 'method' => 'manageUsers'],
+
+        // Users
+        Permission::ViewUsers->value => ['gate' => GlobalGate::class, 'method' => 'viewUsers'],
+        Permission::CreateUsers->value => ['gate' => GlobalGate::class, 'method' => 'manageUsers'],
+        Permission::UpdateUsers->value => ['gate' => GlobalGate::class, 'method' => 'manageUsers'],
+        Permission::DeleteUsers->value => ['gate' => GlobalGate::class, 'method' => 'manageUsers'],
     ];
 
     /**

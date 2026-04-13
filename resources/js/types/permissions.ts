@@ -3,7 +3,10 @@ export enum Permission {
     ViewDashboard = 'dashboard.view',
 
     // Users
-    ManageUsers = 'users.manage',
+   ViewUsers = 'users.view',
+   CreateUsers = 'users.create',
+   UpdateUsers = 'users.update',
+   DeleteUsers = 'users.delete',
 }
 
 export type PermissionKey = `${Permission}`;

@@ -1,0 +1,101 @@
+{
+    "common": {
+        "language": "Language",
+        "languages": {
+            "en": "English",
+            "uk": "Ukrainian"
+        },
+        "status": {
+            "success": "Success",
+            "warning": "Warning",
+            "error": "Error"
+        },
+        "buttons": {
+            "save": "Save",
+            "cancel": "Cancel"
+        }
+    },
+    "settings": {
+        "head": "Settings",
+        "description": "Manage your account settings",
+        "profile": {
+            "head": "Profile Settings",
+            "short": "Profile",
+            "profile": {
+                "title": "Profile Settings",
+                "description": "Update your account's profile information",
+                "name": {
+                    "title": "Name",
+                    "placeholder": "Full Name"
+                },
+                "email": {
+                    "title": "Email",
+                    "placeholder": "Email Address"
+                }
+            },
+            "delete": {
+                "title": "Delete Account",
+                "description": "Permanently delete your account and all associated data",
+                "warning": "Be careful, this action cannot be undone.",
+                "submit": "Delete Account",
+                "dialog": {
+                    "title": "Are you sure you want to delete your account?",
+                    "description": "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.",
+                    "password": {
+                        "placeholder": "Password"
+                    }
+                }
+            }
+        },
+        "security": {
+            "head": "Security Settings",
+            "short": "Security",
+            "password": {
+                "title": "Update Password",
+                "description": "Ensure your account is using a long, random password to stay secure",
+                "current": {
+                    "title": "Current Password",
+                    "placeholder": "Current Password"
+                },
+                "new": {
+                    "title": "New Password",
+                    "placeholder": "New Password"
+                },
+                "confirm": {
+                    "title": "Confirm Password",
+                    "placeholder": "Confirm Password"
+                },
+                "submit": "Save Password"
+            },
+            "2fa": {
+                "title": "Two-Factor Authentication",
+                "description": "Manage your two-factor authentication settings",
+                "body": "When two-factor authentication is enabled, you will be prompted for a secure PIN during login. This PIN can be obtained from an application on your phone that supports the TOTP protocol.",
+                "submit": "Enable 2FA",
+                "continue": "Continue setup",
+                "disable": "Disable 2FA"
+            }
+        },
+        "appearance": {
+            "head": "Appearance Settings",
+            "short": "Appearance",
+            "theme": {
+                "title": "Theme Settings",
+                "description": "Update your account's theme settings",
+                "options": {
+                    "light": "Light",
+                    "dark": "Dark",
+                    "system": "System"
+                }
+            },
+            "language": {
+                "title": "Language Settings",
+                "description": "Update your account's language settings"
+            }
+        }
+    },
+    "header": {
+        "title": "Application"
+    },
+    "test": "test"
+}

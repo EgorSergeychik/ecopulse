@@ -29,7 +29,7 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: users(),
         icon: Users,
-        permission: Permission.ManageUsers,
+        permission: Permission.ViewUsers,
     },
 ];
 

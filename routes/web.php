@@ -13,7 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::group(['prefix' => 'users', 'middleware' => ['auth', 'verified']], function () {
-    Route::inertia('/', 'Users')->can(Permission::ManageUsers)->name('users.index');
+    Route::get('/', [\Domain\User\Controllers\UserController::class, 'index'])
+        ->can(Permission::ViewUsers)->name('users.index');
 });
 
 require __DIR__.'/settings.php';
