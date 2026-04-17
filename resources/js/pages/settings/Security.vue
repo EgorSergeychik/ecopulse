@@ -47,7 +47,7 @@ onUnmounted(() => clearTwoFactorAuthData());
 </script>
 
 <template>
-    <Head title="Security settings" />
+    <Head :title="t('settings.security.head')" />
 
     <h1 class="sr-only">{{ t('settings.security.theme.title') }}</h1>
 

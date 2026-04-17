@@ -15,6 +15,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::group(['prefix' => 'users', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', [\Domain\User\Controllers\UserController::class, 'index'])
         ->can(Permission::ViewUsers)->name('users.index');
+    Route::post('/', [\Domain\User\Controllers\UserController::class, 'store'])
+        ->can(Permission::CreateUsers)->name('users.store');
+    Route::put('/{user}', [\Domain\User\Controllers\UserController::class, 'update'])
+        ->can(Permission::UpdateUsers)->name('users.update');
+    Route::delete('/{user}', [\Domain\User\Controllers\UserController::class, 'destroy'])
+        ->name('users.destroy');
 });
 
 require __DIR__.'/settings.php';

@@ -40,6 +40,7 @@
                 "columns": {
                     "name": "Імʼя",
                     "email": "Електронна пошта",
+                    "role": "Роль",
                     "actions": "Дії",
                     "created_at": "Дата створення"
                 },
@@ -52,9 +53,15 @@
                 },
                 "fields": {
                     "name": "Ім'я",
-                    "email": "Email"
+                    "email": "Email",
+                    "role": "Роль",
+                    "role_placeholder": "Оберіть роль",
+                    "password": "Пароль",
+                    "password_placeholder_edit": "Залиште порожнім, щоб не змінювати пароль",
+                    "password_placeholder_create": "Пароль"
                 }
-            }
+            },
+            "confirm_delete": "Ви впевнені, що хочете видалити {name}?"
         }
     },
     "user_context": {
@@ -142,5 +149,12 @@
     },
     "header": {
         "title": "Додаток"
+    },
+    "table": {
+        "empty": "Немає даних для відображення",
+        "pagination": {
+            "rows_per_page": "Рядків на сторінці",
+            "showing": "Показано {from}–{to} з {total}"
+        }
     }
 }

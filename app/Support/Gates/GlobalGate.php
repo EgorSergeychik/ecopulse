@@ -10,22 +10,40 @@ class GlobalGate
      * Dashboard
      */
 
-    public function viewDashboard(User $user): bool
+    public function viewDashboard(User $admin): bool
     {
-        return $user->isAdmin();
+        return $admin->isAdmin();
     }
 
     /*
      * Users
      */
 
-    public function viewUsers(User $user): bool
+    public function viewUsers(User $admin): bool
     {
-        return $user->isAdmin();
+        return $admin->isAdmin();
     }
 
-    public function manageUsers(User $user): bool
+    public function manageUsers(User $admin): bool
     {
         return false; // Only superadmins can manage users
+    }
+
+    public function deleteUsers(User $admin, ?User $user = null): bool
+    {
+        if ($user === null) {
+            return $admin->isSuperAdmin();
+        }
+
+        return $admin->isSuperAdmin() && $admin->id !== $user->id;
+    }
+
+    /*
+     * Roles
+     */
+
+    public function viewRoles(User $user): bool
+    {
+        return false;
     }
 }

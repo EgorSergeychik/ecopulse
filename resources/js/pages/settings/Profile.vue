@@ -37,9 +37,9 @@ const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <Head :title="t('settings.profile.profile.head')" />
+    <Head :title="t('settings.profile.head')" />
 
-    <h1 class="sr-only">{{ t('settings.profile.profile.head') }}</h1>
+    <h1 class="sr-only">{{ t('settings.profile.head') }}</h1>
 
     <div class="flex flex-col space-y-6">
         <Heading

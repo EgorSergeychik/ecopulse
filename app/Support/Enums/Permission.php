@@ -12,4 +12,7 @@ enum Permission: string
     case CreateUsers = 'users.create';
     case UpdateUsers = 'users.update';
     case DeleteUsers = 'users.delete';
+
+    // Roles
+    case ViewRoles = 'roles.view';
 }

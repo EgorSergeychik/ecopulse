@@ -40,6 +40,7 @@
                 "columns": {
                     "name": "Name",
                     "email": "Email",
+                    "role": "Role",
                     "actions": "Actions",
                     "created_at": "Created At"
                 },
@@ -52,9 +53,12 @@
                 },
                 "fields": {
                     "name": "Name",
-                    "email": "Email"
+                    "email": "Email",
+                    "role": "Role",
+                    "role_placeholder": "Select role"
                 }
-            }
+            },
+            "confirm_delete": "Are you sure you want to delete {name}?"
         }
     },
     "user_context": {
@@ -142,5 +146,12 @@
     },
     "header": {
         "title": "Application"
+    },
+    "table": {
+        "empty": "No data to display",
+        "pagination": {
+            "rows_per_page": "Rows per page",
+            "showing": "Showing {from}–{to} of {total}"
+        }
     }
 }
