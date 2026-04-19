@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { FolderGit2, LayoutGrid, Users } from 'lucide-vue-next';
+import { FolderGit2, LayoutGrid, Map, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as users } from '@/routes/users';
+import { index as zones } from '@/routes/zones';
 import type { NavItem } from '@/types';
 import { Permission } from '@/types/permissions';
 
@@ -30,6 +31,12 @@ const mainNavItems: NavItem[] = [
         href: users(),
         icon: Users,
         permission: Permission.ViewUsers,
+    },
+    {
+        title: 'pages.zones.title',
+        href: zones(),
+        icon: Map,
+        permission: Permission.ViewZones,
     },
 ];
 

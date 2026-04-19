@@ -46,4 +46,23 @@ class GlobalGate
     {
         return false;
     }
+
+    /*
+     * Zones
+     */
+
+    public function viewZones(User $admin): bool
+    {
+        return $admin->isAdmin();
+    }
+
+    public function manageZones(User $admin): bool
+    {
+        return $admin->isAdmin();
+    }
+
+    public function deleteZones(User $admin): bool
+    {
+        return $admin->isAdmin();
+    }
 }

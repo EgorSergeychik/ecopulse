@@ -26,6 +26,12 @@ class AuthServiceProvider extends ServiceProvider
 
         // Roles
         Permission::ViewRoles->value => ['gate' => GlobalGate::class, 'method' => 'viewRoles'],
+
+        // Zones
+        Permission::ViewZones->value => ['gate' => GlobalGate::class, 'method' => 'viewZones'],
+        Permission::CreateZones->value => ['gate' => GlobalGate::class, 'method' => 'manageZones'],
+        Permission::UpdateZones->value => ['gate' => GlobalGate::class, 'method' => 'manageZones'],
+        Permission::DeleteZones->value => ['gate' => GlobalGate::class, 'method' => 'deleteZones'],
     ];
 
     protected $excludedGates = [

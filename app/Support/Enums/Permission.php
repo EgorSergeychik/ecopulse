@@ -15,4 +15,10 @@ enum Permission: string
 
     // Roles
     case ViewRoles = 'roles.view';
+
+    // Zones
+    case ViewZones = 'zones.view';
+    case CreateZones = 'zones.create';
+    case UpdateZones = 'zones.update';
+    case DeleteZones = 'zones.delete';
 }

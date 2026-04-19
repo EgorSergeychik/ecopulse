@@ -18,7 +18,8 @@
     "navigation": {
         "main": {
             "dashboard": "Dashboard",
-            "users": "Users"
+            "users": "Users",
+            "zones": "Zones"
         },
         "footer": {
             "repository": "Repository"
@@ -56,6 +57,37 @@
                     "email": "Email",
                     "role": "Role",
                     "role_placeholder": "Select role"
+                }
+            },
+            "confirm_delete": "Are you sure you want to delete {name}?"
+        },
+        "zones": {
+            "title": "Zones",
+            "description": "Manage monitoring zones",
+            "header": {
+                "buttons": {
+                    "create": "Add Zone"
+                }
+            },
+            "cards": {
+                "empty": "No zones to display",
+                "lat": "Lat",
+                "lng": "Lng",
+                "zoom": "Zoom"
+            },
+            "modal": {
+                "title": {
+                    "create": "Create Zone",
+                    "edit": "Edit Zone"
+                },
+                "fields": {
+                    "name": "Name",
+                    "lat": "Center Latitude",
+                    "lng": "Center Longitude",
+                    "zoom": "Default Zoom",
+                    "thumbnail": "Thumbnail",
+                    "map": "Map",
+                    "map_hint": "Drag the marker to set the center. Draw a rectangle to set the bounding box."
                 }
             },
             "confirm_delete": "Are you sure you want to delete {name}?"
