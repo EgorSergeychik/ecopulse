@@ -87,7 +87,9 @@
                     "zoom": "Default Zoom",
                     "thumbnail": "Thumbnail",
                     "map": "Map",
-                    "map_hint": "Drag the marker to set the center. Draw a rectangle to set the bounding box."
+                    "map_hint": "Drag the marker to set the center. Draw a rectangle to set the bounding box.",
+                    "users": "Users",
+                    "users_empty": "No operators available"
                 }
             },
             "confirm_delete": "Are you sure you want to delete {name}?"

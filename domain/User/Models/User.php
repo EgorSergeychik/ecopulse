@@ -3,8 +3,11 @@
 namespace Domain\User\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\Enums\Permission;
 use App\Support\Enums\Role;
+use App\Support\RBAC\RoleRegistry;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,18 +41,27 @@ class User extends Authenticatable
      * Helpers
      */
 
+    public function zones(): BelongsToMany
+    {
+        return $this->belongsToMany(\Domain\Zone\Models\Zone::class);
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->role === Role::SUPERADMIN;
     }
 
-    public function isAdmin(): bool
-    {
-        return $this->role === Role::ADMIN;
-    }
-
     public function isOperator(): bool
     {
         return $this->role === Role::OPERATOR;
+    }
+
+    public function hasPermission(Permission $permission): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return RoleRegistry::for($this->role->value)->hasPermission($permission);
     }
 }

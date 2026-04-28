@@ -10,10 +10,8 @@ use Domain\User\Models\User;
 use Domain\User\Requests\StoreUserRequest;
 use Domain\User\Requests\UpdateUserRequest;
 use Domain\User\Resources\UserListResource;
-use App\Support\Enums\Permission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -61,7 +59,6 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
-        Gate::authorize(Permission::DeleteUsers, $user);
         $user->delete();
 
         return back();

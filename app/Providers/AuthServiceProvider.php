@@ -3,71 +3,38 @@
 namespace App\Providers;
 
 use App\Support\Enums\Permission;
-use App\Support\Gates\GlobalGate;
+use App\Support\Enums\Role;
+use App\Support\RBAC\RoleRegistry;
 use Domain\User\Models\User;
+use Domain\User\Policies\UserPolicy;
+use Domain\Zone\Models\Zone;
+use Domain\Zone\Policies\ZonePolicy;
 use Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
-    ];
+    public function register(): void {}
 
-    protected $gates = [
-        // Dashboard
-        Permission::ViewDashboard->value => ['gate' => GlobalGate::class, 'method' => 'viewDashboard'],
-
-        // Users
-        Permission::ViewUsers->value => ['gate' => GlobalGate::class, 'method' => 'viewUsers'],
-        Permission::CreateUsers->value => ['gate' => GlobalGate::class, 'method' => 'manageUsers'],
-        Permission::UpdateUsers->value => ['gate' => GlobalGate::class, 'method' => 'manageUsers'],
-        Permission::DeleteUsers->value => ['gate' => GlobalGate::class, 'method' => 'deleteUsers'],
-
-        // Roles
-        Permission::ViewRoles->value => ['gate' => GlobalGate::class, 'method' => 'viewRoles'],
-
-        // Zones
-        Permission::ViewZones->value => ['gate' => GlobalGate::class, 'method' => 'viewZones'],
-        Permission::CreateZones->value => ['gate' => GlobalGate::class, 'method' => 'manageZones'],
-        Permission::UpdateZones->value => ['gate' => GlobalGate::class, 'method' => 'manageZones'],
-        Permission::DeleteZones->value => ['gate' => GlobalGate::class, 'method' => 'deleteZones'],
-    ];
-
-    protected $excludedGates = [
-        Permission::DeleteUsers->value,
-    ];
-
-    /**
-     * Register services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
-        Gate::before(function (User $user, string $ability) {
-            if ($user->isSuperAdmin() && !in_array($ability, $this->excludedGates)) {
-                return true;
-            }
-        });
-
-        foreach ($this->gates as $ability => $gate) {
-            Gate::define($ability, [$gate['gate'], $gate['method']]);
-        };
-
-        $this->registerPolicies();
+        $this->defineRoles();
+        $this->definePolicies();
     }
 
-    private function registerPolicies(): void
+    private function defineRoles(): void
     {
-        foreach ($this->policies as $model => $policy) {
-            Gate::policy($model, $policy);
-        }
+        RoleRegistry::define(
+            Role::OPERATOR->value,
+            Permission::ViewDashboard,
+            Permission::ViewZones,
+            Permission::UpdateZones,
+        );
+    }
+
+    private function definePolicies(): void
+    {
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Zone::class, ZonePolicy::class);
     }
 }

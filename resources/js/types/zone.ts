@@ -8,4 +8,5 @@ export interface Zone {
     default_zoom: number;
     polygon?: LatLng[] | null;
     thumbnail_url?: string;
+    user_ids: number[];
 }

@@ -3,7 +3,8 @@
 namespace Domain\Zone\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Support\Enums\Permission;
+use App\Support\Enums\Role;
+use Domain\User\Models\User;
 use Domain\Zone\DTO\ZoneData;
 use Domain\Zone\Models\Zone;
 use Domain\Zone\Requests\StoreZoneRequest;
@@ -11,18 +12,23 @@ use Domain\Zone\Requests\UpdateZoneRequest;
 use Domain\Zone\Resources\ZoneListResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class ZoneController extends Controller
 {
     public function index(Request $request)
     {
         $zones = Zone::query()
-            ->latest()
+            ->checkAccess()
+            ->with('users')
             ->paginate($request->input('per_page', 10));
+
+        $users = User::where('role', Role::OPERATOR->value)
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return inertia('Zones', [
             'zones' => ZoneListResource::collection($zones),
+            'users' => $users,
         ]);
     }
 
@@ -37,6 +43,8 @@ class ZoneController extends Controller
             'default_zoom' => $data->default_zoom,
             'bounding_box' => $data->polygon,
         ]);
+
+        $zone->users()->sync($data->user_ids);
 
         if ($request->hasFile('thumbnail')) {
             $zone->addMediaFromRequest('thumbnail')
@@ -59,6 +67,8 @@ class ZoneController extends Controller
             'bounding_box' => $data->polygon,
         ]);
 
+        $zone->users()->sync($data->user_ids);
+
         if ($request->hasFile('thumbnail')) {
             $zone->addMediaFromRequest('thumbnail')
                 ->sanitizingFileName(fn(string $name) => preg_replace('/[^a-zA-Z0-9.\-_]/', '-', $name))
@@ -70,7 +80,6 @@ class ZoneController extends Controller
 
     public function destroy(Zone $zone): RedirectResponse
     {
-        Gate::authorize(Permission::DeleteZones, $zone);
         $zone->delete();
 
         return back();

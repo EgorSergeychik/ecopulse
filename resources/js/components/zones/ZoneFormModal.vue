@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,19 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Multiselect } from '@/components/ui/multiselect';
 import ZoneMap from '@/components/zones/ZoneMap.vue';
 import type { LatLng, Zone } from '@/types/zone';
+
+interface SelectUser {
+    id: number;
+    name: string;
+}
 
 const props = defineProps<{
     open: boolean;
     zone?: Zone;
+    users: SelectUser[];
 }>();
 
 const emit = defineEmits(['update:open']);
@@ -35,7 +42,12 @@ const form = useForm({
     default_zoom: '12',
     polygon: null as LatLng[] | null,
     thumbnail: null as File | null,
+    user_ids: [] as number[],
 });
+
+const userOptions = computed(() =>
+    props.users.map((u) => ({ value: u.id, label: u.name })),
+);
 
 watch(
     () => props.open,
@@ -48,12 +60,14 @@ watch(
                 form.default_zoom = String(props.zone.default_zoom);
                 form.polygon = props.zone.polygon ?? null;
                 form.thumbnail = null;
+                form.user_ids = [...(props.zone.user_ids ?? [])];
             } else {
                 form.reset();
                 form.center_lat = '50.45';
                 form.center_lng = '30.52';
                 form.default_zoom = '12';
                 form.polygon = null;
+                form.user_ids = [];
             }
 
             if (fileInput.value) {
@@ -61,7 +75,6 @@ watch(
             }
 
             showMap.value = false;
-
             setTimeout(() => {
                 showMap.value = true;
             }, 150);
@@ -76,23 +89,22 @@ const handleFileChange = (e: Event) => {
 };
 
 const submit = () => {
-    const payload = {
-        name: form.name,
-        center_lat: form.center_lat,
-        center_lng: form.center_lng,
-        default_zoom: form.default_zoom,
-        polygon: form.polygon ? JSON.stringify(form.polygon) : '',
-        thumbnail: form.thumbnail,
-        _method: props.zone ? 'PUT' : undefined,
-    };
-
     const url = props.zone ? `/zones/${props.zone.id}` : '/zones';
-
-    useForm(payload).post(url, {
+    const options = {
         forceFormData: true,
         onSuccess: () => emit('update:open', false),
-        onError: (errors) => Object.assign(form.errors, errors),
-    });
+    };
+
+    const transformed = form.transform((data) => ({
+        ...data,
+        polygon: data.polygon ? JSON.stringify(data.polygon) : null,
+    }));
+
+    if (props.zone) {
+        transformed.put(url, options);
+    } else {
+        transformed.post(url, options);
+    }
 };
 </script>
 
@@ -207,6 +219,18 @@ const submit = () => {
                         @change="handleFileChange"
                     />
                     <InputError :message="form.errors.thumbnail" />
+                </div>
+
+                <!-- Users -->
+                <div class="space-y-2">
+                    <Label>{{ t('pages.zones.modal.fields.users') }}</Label>
+                    <Multiselect
+                        :model-value="form.user_ids"
+                        :options="userOptions"
+                        :placeholder="t('pages.zones.modal.fields.users_empty')"
+                        @update:model-value="form.user_ids = $event as number[]"
+                    />
+                    <InputError :message="form.errors.user_ids" />
                 </div>
 
                 <DialogFooter>

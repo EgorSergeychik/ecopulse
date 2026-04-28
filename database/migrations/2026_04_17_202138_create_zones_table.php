@@ -22,6 +22,12 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
+        Schema::create('user_zone', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('zone_id')->constrained()->cascadeOnDelete();
+            $table->primary(['user_id', 'zone_id']);
+        });
     }
 
     /**

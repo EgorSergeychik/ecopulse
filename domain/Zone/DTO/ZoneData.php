@@ -11,7 +11,8 @@ class ZoneData
         public float $center_lat,
         public float $center_lng,
         public int $default_zoom,
-        public ?array $polygon = null,
+        public ?array $polygon,
+        public array $user_ids,
     ) {
     }
 
@@ -23,6 +24,7 @@ class ZoneData
             center_lng: (float) $request->center_lng,
             default_zoom: (int) $request->default_zoom,
             polygon: $request->polygon ? json_decode($request->polygon, true) : null,
+            user_ids: $request->user_ids ?? [],
         );
     }
 }

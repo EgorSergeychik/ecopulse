@@ -49,6 +49,8 @@ class UpdateZoneRequest extends FormRequest
                 'image',
                 'max:10240',
             ],
+            'user_ids' => ['nullable', 'array'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
         ];
     }
 }

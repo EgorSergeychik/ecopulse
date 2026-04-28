@@ -19,6 +19,7 @@ class ZoneListResource extends JsonResource
             'default_zoom' => $this->default_zoom,
             'polygon' => $this->bounding_box,
             'thumbnail_url' => $this->getFirstMediaUrl('thumbnail', 'thumb'),
+            'user_ids' => $this->users->pluck('id')->toArray(),
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }

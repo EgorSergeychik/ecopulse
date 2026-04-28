@@ -41,7 +41,7 @@ class HandleInertiaRequests extends Middleware
 
         if ($user) {
             foreach (Permission::cases() as $permission) {
-                $permissions[$permission->value] = $user->can($permission->value);
+                $permissions[$permission->value] = $user->hasPermission($permission);
             }
         }
 

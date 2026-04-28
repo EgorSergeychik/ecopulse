@@ -11,8 +11,14 @@ import { usePermission } from '@/composables/usePermission';
 import { index as zonesIndex } from '@/routes/zones';
 import { Permission } from '@/types/permissions';
 
-defineProps<{
+interface SelectUser {
+    id: number;
+    name: string;
+}
+
+const props = defineProps<{
     zones: any;
+    users: SelectUser[];
 }>();
 
 const { t } = useI18n();
@@ -133,5 +139,5 @@ const deleteZone = (zone: any) => {
         <DataTablePagination :meta="zones.meta" />
     </div>
 
-    <ZoneFormModal v-model:open="isModalOpen" :zone="editingZone" />
+    <ZoneFormModal v-model:open="isModalOpen" :zone="editingZone" :users="props.users" />
 </template>
