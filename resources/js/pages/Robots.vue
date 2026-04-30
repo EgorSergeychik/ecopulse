@@ -1,13 +1,23 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { Pencil, Plus, Power, Trash, TriangleAlert, Wrench } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
+import { useClipboard } from '@vueuse/core';
+import { KeyRound, Pencil, Plus, Power, RefreshCw, Trash, TriangleAlert, Wrench } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
 import RobotFormModal from '@/components/robots/RobotFormModal.vue';
 import RowActionsMenu from '@/components/RowActionsMenu.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
     DataTable,
     DataTablePagination,
@@ -23,6 +33,12 @@ import type { Robot } from '@/types/robot';
 interface SelectZone {
     id: number;
     name: string;
+}
+
+interface RobotTokenFlash {
+    robot_id: number;
+    robot_name: string;
+    token: string;
 }
 
 defineProps<{
@@ -45,9 +61,13 @@ defineOptions({
 });
 
 const { can } = usePermission();
+const page = usePage();
+const { copy } = useClipboard();
 
 const isModalOpen = ref(false);
 const editingRobot = ref<Robot | null>(null);
+const isTokenDialogOpen = ref(false);
+const tokenPayload = ref<RobotTokenFlash | null>(null);
 
 const columns = computed<TableColumn[]>(() => [
     { key: 'name', label: t('pages.robots.table.columns.name') },
@@ -76,6 +96,10 @@ const deleteRobot = (robot: Robot) => {
     if (confirm(t('pages.robots.confirm_delete', { name: robot.name }))) {
         router.delete(`/robots/${robot.id}`);
     }
+};
+
+const regenerateRobotToken = (robot: Robot) => {
+    router.post(`/robots/${robot.id}/token/regenerate`);
 };
 
 const nextTransitionState = (robot: Robot): 'maintenance' | 'offline' | null => {
@@ -128,6 +152,31 @@ const statusVariant = (status: string): 'default' | 'secondary' | 'destructive' 
 };
 
 const canAction = (permission: PermissionType) => can(permission);
+
+const copyRobotToken = async (event: MouseEvent) => {
+    if (!tokenPayload.value?.token) {
+        return;
+    }
+
+    await copy(tokenPayload.value.token);
+
+    if (event.target instanceof HTMLInputElement) {
+        event.target.select();
+    }
+};
+
+watch(
+    () => page.props.robot_token as RobotTokenFlash | null | undefined,
+    (robotToken) => {
+        if (!robotToken?.token) {
+            return;
+        }
+
+        tokenPayload.value = robotToken;
+        isTokenDialogOpen.value = true;
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -203,6 +252,16 @@ const canAction = (permission: PermissionType) => can(permission);
                                 ],
                             },
                             {
+                                label: t('pages.robots.actions.token_group'),
+                                items: canAction(Permission.UpdateRobots)
+                                    ? [{
+                                        label: t('pages.robots.actions.regenerate_token'),
+                                        icon: RefreshCw,
+                                        onSelect: () => regenerateRobotToken(row),
+                                    }]
+                                    : [],
+                            },
+                            {
                                 label: t('pages.robots.actions.status_group'),
                                 items: canAction(Permission.TransitionRobots) && nextTransitionState(row)
                                     ? [{
@@ -231,4 +290,42 @@ const canAction = (permission: PermissionType) => can(permission);
         :robot="editingRobot"
         :zones="zones"
     />
+
+    <Dialog v-model:open="isTokenDialogOpen">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle class="flex items-center gap-2">
+                    <KeyRound class="h-4 w-4" />
+                    {{ t('pages.robots.token_dialog.title') }}
+                </DialogTitle>
+                <DialogDescription>
+                    {{ t('pages.robots.token_dialog.description') }}
+                </DialogDescription>
+            </DialogHeader>
+
+            <div v-if="tokenPayload" class="space-y-4">
+                <div class="rounded-md border bg-muted/40 p-3 text-sm">
+                    <span class="font-medium">{{ tokenPayload.robot_name }}</span>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">
+                        {{ t('pages.robots.token_dialog.token_label') }}
+                    </label>
+                    <Input
+                        :model-value="tokenPayload.token"
+                        readonly
+                        class="cursor-copy"
+                        @click="copyRobotToken"
+                    />
+                </div>
+            </div>
+
+            <DialogFooter>
+                <Button type="button" @click="isTokenDialogOpen = false">
+                    {{ t('pages.robots.token_dialog.close') }}
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>

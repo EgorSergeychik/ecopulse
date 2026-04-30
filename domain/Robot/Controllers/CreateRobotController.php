@@ -19,8 +19,13 @@ class CreateRobotController extends Controller
     {
         $data = RobotData::fromRequest($request);
 
-        ($this->createRobot)($data);
+        $robot = ($this->createRobot)($data);
+        $token = $robot->issueAccessToken();
 
-        return back();
+        return back()->with('robot_token', [
+            'robot_id' => $robot->id,
+            'robot_name' => $robot->name,
+            'token' => $token->plainTextToken,
+        ]);
     }
 }

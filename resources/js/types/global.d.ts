@@ -18,6 +18,11 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            robot_token?: {
+                robot_id: number;
+                robot_name: string;
+                token: string;
+            } | null;
             sidebarOpen: boolean;
             [key: string]: unknown;
         };

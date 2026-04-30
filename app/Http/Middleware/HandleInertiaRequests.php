@@ -52,6 +52,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
                 'permissions' => $permissions,
             ],
+            'robot_token' => $request->session()->get('robot_token'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

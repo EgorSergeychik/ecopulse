@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Laravel\Sanctum\NewAccessToken;
+use Laravel\Sanctum\HasApiTokens;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -17,6 +19,9 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 class Robot extends Model
 {
     use HasRelationships;
+    use HasApiTokens;
+
+    private const ACCESS_TOKEN_NAME = 'robot-api-token';
 
     protected function casts(): array
     {
@@ -56,6 +61,22 @@ class Robot extends Model
         }
 
         return $this->users->where('id', $user->id)->isNotEmpty();
+    }
+
+    /*
+     * Tokens
+     */
+
+    public function issueAccessToken(): NewAccessToken
+    {
+        return $this->createToken(self::ACCESS_TOKEN_NAME);
+    }
+
+    public function regenerateAccessToken(): NewAccessToken
+    {
+        $this->tokens()->delete();
+
+        return $this->issueAccessToken();
     }
 
     /*

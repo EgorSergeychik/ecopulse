@@ -4,6 +4,7 @@ return [
     'messages' => [
         'profile_updated' => 'Профіль оновлено.',
         'password_updated' => 'Пароль оновлено.',
+        'robot_token_regenerated' => 'Токен робота перевипущено.',
     ],
     'roles' => [
         \App\Support\Enums\Role::SUPERADMIN->value => 'Суперадмін',

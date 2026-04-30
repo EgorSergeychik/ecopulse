@@ -17,7 +17,8 @@
         "actions": {
             "open_menu": "Open actions menu",
             "edit": "Edit",
-            "delete": "Delete"
+            "delete": "Delete",
+            "regenerate": "Regenerate"
         }
     },
     "navigation": {
@@ -120,9 +121,17 @@
                 "empty": "No robots to display"
             },
             "actions": {
+                "token_group": "Token",
                 "status_group": "Status",
+                "regenerate_token": "Regenerate",
                 "to_maintenance": "To maintenance",
                 "to_offline": "To offline"
+            },
+            "token_dialog": {
+                "title": "Robot access token",
+                "description": "Save this token now. It will only be shown once.",
+                "token_label": "Plain text token",
+                "close": "I saved it"
             },
             "modal": {
                 "title": {

@@ -17,7 +17,8 @@
         "actions": {
             "open_menu": "Відкрити меню дій",
             "edit": "Редагувати",
-            "delete": "Видалити"
+            "delete": "Видалити",
+            "regenerate": "Перевипустити"
         }
     },
     "navigation": {
@@ -123,9 +124,17 @@
                 "empty": "Немає роботів для відображення"
             },
             "actions": {
+                "token_group": "Токен",
                 "status_group": "Статус",
+                "regenerate_token": "Перевипустити",
                 "to_maintenance": "На обслуговування",
                 "to_offline": "В офлайн"
+            },
+            "token_dialog": {
+                "title": "Токен доступу робота",
+                "description": "Збережіть цей токен зараз. Він буде показаний лише один раз.",
+                "token_label": "Токен у відкритому вигляді",
+                "close": "Я зберіг токен"
             },
             "modal": {
                 "title": {
