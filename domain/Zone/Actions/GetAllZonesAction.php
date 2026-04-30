@@ -13,7 +13,10 @@ class GetAllZonesAction
         return Zone::query()
             ->checkAccess()
             ->when($data->search, fn ($query) => $query->search($data->search))
-            ->with('users')
+            ->with([
+                'users:id',
+                'media',
+            ])
             ->paginate($data->limit)
             ->withQueryString();
     }

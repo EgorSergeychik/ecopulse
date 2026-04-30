@@ -13,7 +13,7 @@ class GetAllRobotsAction
         return Robot::query()
             ->checkAccess()
             ->when($data->search, fn ($query) => $query->search($data->search))
-            ->with('zone')
+            ->with('zone:id,name')
             ->latest()
             ->paginate($data->limit)
             ->withQueryString();
