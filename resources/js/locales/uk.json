@@ -19,7 +19,8 @@
         "main": {
             "dashboard": "Дашборд",
             "users": "Користувачі",
-            "zones": "Зони"
+            "zones": "Зони",
+            "robots": "Роботи"
         },
         "footer": {
             "repository": "Репозиторій"
@@ -93,6 +94,43 @@
                     "map_hint": "Перетягніть маркер, щоб задати центр. Намалюйте прямокутник для bounding box.",
                     "users": "Користувачі",
                     "users_empty": "Немає доступних операторів"
+                }
+            },
+            "confirm_delete": "Ви впевнені, що хочете видалити {name}?"
+        },
+        "robots": {
+            "title": "Роботи",
+            "description": "Керуйте роботами та їхнім поточним станом",
+            "header": {
+                "buttons": {
+                    "create": "Додати робота"
+                }
+            },
+            "table": {
+                "columns": {
+                    "name": "Назва",
+                    "mac_address": "MAC-адреса",
+                    "zone": "Зона",
+                    "status": "Статус",
+                    "battery_pct": "Батарея",
+                    "actions": "Дії",
+                    "created_at": "Дата створення"
+                },
+                "empty": "Немає роботів для відображення"
+            },
+            "modal": {
+                "title": {
+                    "create": "Створити робота",
+                    "edit": "Редагувати робота"
+                },
+                "fields": {
+                    "name": "Назва",
+                    "mac_address": "MAC-адреса",
+                    "zone": "Зона",
+                    "zone_placeholder": "Оберіть зону",
+                    "status": "Статус",
+                    "status_placeholder": "Оберіть статус",
+                    "battery_pct": "Відсоток заряду"
                 }
             },
             "confirm_delete": "Ви впевнені, що хочете видалити {name}?"

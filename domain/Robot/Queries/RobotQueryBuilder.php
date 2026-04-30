@@ -1,10 +1,11 @@
 <?php
 
-namespace Domain\Zone\Queries;
+namespace Domain\Robot\Queries;
 
+use Domain\User\Queries\UserQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 
-class ZoneQueryBuilder extends Builder
+class RobotQueryBuilder extends Builder
 {
     /*
      * Access
@@ -30,7 +31,7 @@ class ZoneQueryBuilder extends Builder
 
     public function userId(int $userId): self
     {
-        return $this->whereHas('users', fn ($query) => $query
+        return $this->whereHas('zone.users', fn (UserQueryBuilder $query) => $query
             ->where('users.id', $userId)
         );
     }
@@ -42,8 +43,9 @@ class ZoneQueryBuilder extends Builder
     public function search(string $search): self
     {
         return $this->where(fn (self $query) => $query
-            ->where('zones.name', 'like', "%{$search}%")
-            ->orWhereRelation('users', 'name', 'like', "%{$search}%")
+            ->where('robots.name', 'like', "%{$search}%")
+            ->orWhereRelation('zone', 'name', 'like', "%{$search}%")
+            ->orWhereRelation('zone.users', 'name', 'like', "%{$search}%")
         );
     }
 }

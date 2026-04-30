@@ -19,7 +19,8 @@
         "main": {
             "dashboard": "Dashboard",
             "users": "Users",
-            "zones": "Zones"
+            "zones": "Zones",
+            "robots": "Robots"
         },
         "footer": {
             "repository": "Repository"
@@ -90,6 +91,43 @@
                     "map_hint": "Drag the marker to set the center. Draw a rectangle to set the bounding box.",
                     "users": "Users",
                     "users_empty": "No operators available"
+                }
+            },
+            "confirm_delete": "Are you sure you want to delete {name}?"
+        },
+        "robots": {
+            "title": "Robots",
+            "description": "Manage robots and their current state",
+            "header": {
+                "buttons": {
+                    "create": "Add Robot"
+                }
+            },
+            "table": {
+                "columns": {
+                    "name": "Name",
+                    "mac_address": "MAC Address",
+                    "zone": "Zone",
+                    "status": "Status",
+                    "battery_pct": "Battery",
+                    "actions": "Actions",
+                    "created_at": "Created At"
+                },
+                "empty": "No robots to display"
+            },
+            "modal": {
+                "title": {
+                    "create": "Create Robot",
+                    "edit": "Edit Robot"
+                },
+                "fields": {
+                    "name": "Name",
+                    "mac_address": "MAC Address",
+                    "zone": "Zone",
+                    "zone_placeholder": "Select zone",
+                    "status": "Status",
+                    "status_placeholder": "Select status",
+                    "battery_pct": "Battery Percentage"
                 }
             },
             "confirm_delete": "Are you sure you want to delete {name}?"

@@ -50,6 +50,14 @@ const form = useForm({
     password: '',
 });
 
+const resetCreateForm = () => {
+    form.clearErrors();
+    form.name = '';
+    form.email = '';
+    form.role = '';
+    form.password = '';
+};
+
 const passwordPlaceholder = computed(() => {
     return props.user
         ? t('pages.users.modal.fields.password_placeholder_edit')
@@ -66,7 +74,7 @@ watch(
                 form.role = props.user.role_id;
                 form.password = '';
             } else {
-                form.reset();
+                resetCreateForm();
             }
         }
     },
@@ -79,7 +87,10 @@ const submit = () => {
         });
     } else {
         form.post('/users', {
-            onSuccess: () => emit('update:open', false),
+            onSuccess: () => {
+                resetCreateForm();
+                emit('update:open', false);
+            },
         });
     }
 };

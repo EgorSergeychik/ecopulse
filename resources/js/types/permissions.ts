@@ -13,6 +13,12 @@ export enum Permission {
     CreateZones = 'zones.create',
     UpdateZones = 'zones.update',
     DeleteZones = 'zones.delete',
+
+    // Robots
+    ViewRobots = 'robots.view',
+    CreateRobots = 'robots.create',
+    UpdateRobots = 'robots.update',
+    DeleteRobots = 'robots.delete',
 }
 
 export type PermissionKey = `${Permission}`;

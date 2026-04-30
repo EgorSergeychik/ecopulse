@@ -18,4 +18,10 @@ enum Permission: string
     case CreateZones = 'zones.create';
     case UpdateZones = 'zones.update';
     case DeleteZones = 'zones.delete';
+
+    // Robots
+    case ViewRobots = 'robots.view';
+    case CreateRobots = 'robots.create';
+    case UpdateRobots = 'robots.update';
+    case DeleteRobots = 'robots.delete';
 }

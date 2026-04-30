@@ -45,6 +45,17 @@ const form = useForm({
     user_ids: [] as number[],
 });
 
+const resetCreateForm = () => {
+    form.clearErrors();
+    form.name = '';
+    form.center_lat = '50.45';
+    form.center_lng = '30.52';
+    form.default_zoom = '12';
+    form.polygon = null;
+    form.thumbnail = null;
+    form.user_ids = [];
+};
+
 const userOptions = computed(() =>
     props.users.map((u) => ({ value: u.id, label: u.name })),
 );
@@ -62,12 +73,7 @@ watch(
                 form.thumbnail = null;
                 form.user_ids = [...(props.zone.user_ids ?? [])];
             } else {
-                form.reset();
-                form.center_lat = '50.45';
-                form.center_lng = '30.52';
-                form.default_zoom = '12';
-                form.polygon = null;
-                form.user_ids = [];
+                resetCreateForm();
             }
 
             if (fileInput.value) {
@@ -103,7 +109,13 @@ const submit = () => {
     if (props.zone) {
         transformed.put(url, options);
     } else {
-        transformed.post(url, options);
+        transformed.post(url, {
+            ...options,
+            onSuccess: () => {
+                resetCreateForm();
+                emit('update:open', false);
+            },
+        });
     }
 };
 </script>

@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Support\Enums\Permission;
 use App\Support\Enums\Role;
 use App\Support\RBAC\RoleRegistry;
+use Domain\Robot\Models\Robot;
+use Domain\Robot\Policies\RobotPolicy;
 use Domain\User\Models\User;
 use Domain\User\Policies\UserPolicy;
 use Domain\Zone\Models\Zone;
@@ -27,8 +29,11 @@ class AuthServiceProvider extends ServiceProvider
         RoleRegistry::define(
             Role::OPERATOR->value,
             Permission::ViewDashboard,
+
             Permission::ViewZones,
             Permission::UpdateZones,
+
+            Permission::ViewRobots,
         );
     }
 
@@ -36,5 +41,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Zone::class, ZonePolicy::class);
+        Gate::policy(Robot::class, RobotPolicy::class);
     }
 }
