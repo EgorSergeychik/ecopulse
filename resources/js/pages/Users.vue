@@ -5,7 +5,11 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
-import { DataTable, DataTablePagination } from '@/components/ui/table';
+import {
+    DataTable,
+    DataTablePagination,
+    DataTableSearch,
+} from '@/components/ui/table';
 import type { TableColumn } from '@/components/ui/table';
 import UserFormModal from '@/components/users/UserFormModal.vue';
 import { usePermission } from '@/composables/usePermission';
@@ -15,6 +19,7 @@ import { Permission } from '@/types/permissions';
 defineProps<{
     users: any;
     roles: { data: { id: string; name: string }[] };
+    filters: { search: string | null };
 }>();
 
 const { t } = useI18n();
@@ -33,14 +38,18 @@ defineOptions({
 const { can } = usePermission();
 
 const isModalOpen = ref(false);
-const editingUser = ref(undefined);
+const editingUser = ref<any | null>(undefined);
 
 const columns = computed<TableColumn[]>(() => [
     { key: 'name', label: t('pages.users.table.columns.name') },
     { key: 'email', label: t('pages.users.table.columns.email') },
     { key: 'role', label: t('pages.users.table.columns.role') },
     { key: 'created_at', label: t('pages.users.table.columns.created_at') },
-    { key: 'actions', label: t('pages.users.table.columns.actions'), align: 'right' },
+    {
+        key: 'actions',
+        label: t('pages.users.table.columns.actions'),
+        align: 'right',
+    },
 ]);
 
 const openCreateModal = () => {
@@ -64,27 +73,49 @@ const deleteUser = (user: any) => {
     <Head :title="t('pages.users.title')" />
 
     <div class="space-y-6 p-6">
-        <div class="flex items-center justify-between">
+        <div
+            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <Heading
                 :title="t('pages.users.title')"
                 :description="t('pages.users.description')"
             />
-            <Button v-if="can(Permission.CreateUsers)" @click="openCreateModal">
-                <Plus class="mr-2 h-4 w-4" />
-                {{ t('pages.users.header.buttons.create') }}
-            </Button>
+            <div
+                class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
+            >
+                <DataTableSearch :model-value="filters.search" />
+                <Button
+                    v-if="can(Permission.CreateUsers)"
+                    @click="openCreateModal"
+                >
+                    <Plus class="mr-2 h-4 w-4" />
+                    {{ t('pages.users.header.buttons.create') }}
+                </Button>
+            </div>
         </div>
 
-        <DataTable :columns="columns" :data="users.data" :empty-text="t('pages.users.table.empty')">
+        <DataTable
+            :columns="columns"
+            :data="users.data"
+            :empty-text="t('pages.users.table.empty')"
+        >
             <template #cell-name="{ row }">
                 <span class="font-medium">{{ row.name }}</span>
             </template>
             <template #cell-actions="{ row }">
                 <div class="flex justify-end gap-2">
-                    <Button variant="outline" size="icon" @click="openEditModal(row)">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        @click="openEditModal(row)"
+                    >
                         <Pencil class="h-4 w-4" />
                     </Button>
-                    <Button variant="destructive" size="icon" @click="deleteUser(row)">
+                    <Button
+                        variant="destructive"
+                        size="icon"
+                        @click="deleteUser(row)"
+                    >
                         <Trash class="h-4 w-4" />
                     </Button>
                 </div>
@@ -94,5 +125,9 @@ const deleteUser = (user: any) => {
         <DataTablePagination :meta="users.meta" />
     </div>
 
-    <UserFormModal v-model:open="isModalOpen" :user="editingUser" :roles="roles.data" />
+    <UserFormModal
+        v-model:open="isModalOpen"
+        :user="editingUser"
+        :roles="roles.data"
+    />
 </template>

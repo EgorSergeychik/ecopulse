@@ -7,10 +7,11 @@ use App\Support\Enums\Permission;
 use App\Support\Enums\Role;
 use App\Support\RBAC\RoleRegistry;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Domain\User\Queries\UserQueryBuilder;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -22,11 +23,6 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -38,13 +34,17 @@ class User extends Authenticatable
     }
 
     /*
-     * Helpers
+     * Relations
      */
 
     public function zones(): BelongsToMany
     {
         return $this->belongsToMany(\Domain\Zone\Models\Zone::class);
     }
+
+    /*
+     * Helpers
+     */
 
     public function isSuperAdmin(): bool
     {
@@ -63,5 +63,14 @@ class User extends Authenticatable
         }
 
         return RoleRegistry::for($this->role->value)->hasPermission($permission);
+    }
+
+    /*
+     * Queries
+     */
+
+    public function newEloquentBuilder($query): UserQueryBuilder
+    {
+        return new UserQueryBuilder($query);
     }
 }

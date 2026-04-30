@@ -186,6 +186,9 @@
     },
     "table": {
         "empty": "Немає даних для відображення",
+        "search": {
+            "placeholder": "Пошук"
+        },
         "pagination": {
             "rows_per_page": "Рядків на сторінці",
             "showing": "Показано {from}–{to} з {total}"

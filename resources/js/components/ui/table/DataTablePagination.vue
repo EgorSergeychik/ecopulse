@@ -19,10 +19,22 @@ const { t } = useI18n();
 const prevUrl = computed(() => props.meta.links.at(0)?.url ?? null);
 const nextUrl = computed(() => props.meta.links.at(-1)?.url ?? null);
 
-const changePageSize = (size: string) => {
+const changePageSize = (size: unknown) => {
+    if (size === null || size === undefined) {
+        return;
+    }
+
+    const normalizedSize = String(size);
+    const params = new URLSearchParams(window.location.search);
+
+    params.set('per_page', normalizedSize);
+    params.delete('page');
+
     router.visit(props.meta.path, {
-        data: { per_page: size },
+        data: Object.fromEntries(params.entries()),
         preserveScroll: true,
+        preserveState: true,
+        replace: true,
     });
 };
 

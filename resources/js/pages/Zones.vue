@@ -5,7 +5,11 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
-import { DataTablePagination, DataView } from '@/components/ui/table';
+import {
+    DataTablePagination,
+    DataTableSearch,
+    DataView,
+} from '@/components/ui/table';
 import ZoneFormModal from '@/components/zones/ZoneFormModal.vue';
 import { usePermission } from '@/composables/usePermission';
 import { index as zonesIndex } from '@/routes/zones';
@@ -19,6 +23,7 @@ interface SelectUser {
 const props = defineProps<{
     zones: any;
     users: SelectUser[];
+    filters: { search: string | null };
 }>();
 
 const { t } = useI18n();
@@ -37,7 +42,7 @@ defineOptions({
 const { can } = usePermission();
 
 const isModalOpen = ref(false);
-const editingZone = ref(undefined);
+const editingZone = ref<any | null>(undefined);
 
 const openCreateModal = () => {
     editingZone.value = null;
@@ -60,15 +65,25 @@ const deleteZone = (zone: any) => {
     <Head :title="t('pages.zones.title')" />
 
     <div class="space-y-6 p-6">
-        <div class="flex items-center justify-between">
+        <div
+            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <Heading
                 :title="t('pages.zones.title')"
                 :description="t('pages.zones.description')"
             />
-            <Button v-if="can(Permission.CreateZones)" @click="openCreateModal">
-                <Plus class="mr-2 h-4 w-4" />
-                {{ t('pages.zones.header.buttons.create') }}
-            </Button>
+            <div
+                class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
+            >
+                <DataTableSearch :model-value="filters.search" />
+                <Button
+                    v-if="can(Permission.CreateZones)"
+                    @click="openCreateModal"
+                >
+                    <Plus class="mr-2 h-4 w-4" />
+                    {{ t('pages.zones.header.buttons.create') }}
+                </Button>
+            </div>
         </div>
 
         <DataView :data="zones.data" :empty-text="t('pages.zones.cards.empty')">
@@ -96,15 +111,21 @@ const deleteZone = (zone: any) => {
             <template #body="{ row }">
                 <div class="mt-1 space-y-0.5 text-sm text-muted-foreground">
                     <p>
-                        <span class="font-medium">{{ t('pages.zones.cards.lat') }}:</span>
+                        <span class="font-medium"
+                            >{{ t('pages.zones.cards.lat') }}:</span
+                        >
                         {{ row.center_lat }}
                     </p>
                     <p>
-                        <span class="font-medium">{{ t('pages.zones.cards.lng') }}:</span>
+                        <span class="font-medium"
+                            >{{ t('pages.zones.cards.lng') }}:</span
+                        >
                         {{ row.center_lng }}
                     </p>
                     <p>
-                        <span class="font-medium">{{ t('pages.zones.cards.zoom') }}:</span>
+                        <span class="font-medium"
+                            >{{ t('pages.zones.cards.zoom') }}:</span
+                        >
                         {{ row.default_zoom }}
                     </p>
                 </div>
@@ -132,12 +153,18 @@ const deleteZone = (zone: any) => {
             </template>
 
             <template #footer="{ row }">
-                <p class="text-xs text-muted-foreground">{{ row.created_at }}</p>
+                <p class="text-xs text-muted-foreground">
+                    {{ row.created_at }}
+                </p>
             </template>
         </DataView>
 
         <DataTablePagination :meta="zones.meta" />
     </div>
 
-    <ZoneFormModal v-model:open="isModalOpen" :zone="editingZone" :users="props.users" />
+    <ZoneFormModal
+        v-model:open="isModalOpen"
+        :zone="editingZone"
+        :users="props.users"
+    />
 </template>

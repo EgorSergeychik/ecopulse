@@ -183,6 +183,9 @@
     },
     "table": {
         "empty": "No data to display",
+        "search": {
+            "placeholder": "Search"
+        },
         "pagination": {
             "rows_per_page": "Rows per page",
             "showing": "Showing {from}–{to} of {total}"

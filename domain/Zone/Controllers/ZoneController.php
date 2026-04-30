@@ -3,9 +3,9 @@
 namespace Domain\Zone\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Support\Enums\Role;
 use Domain\User\Models\User;
 use Domain\Zone\DTO\ZoneData;
+use Domain\Zone\DTO\ZoneIndexData;
 use Domain\Zone\Models\Zone;
 use Domain\Zone\Requests\StoreZoneRequest;
 use Domain\Zone\Requests\UpdateZoneRequest;
@@ -17,18 +17,26 @@ class ZoneController extends Controller
 {
     public function index(Request $request)
     {
+        $data = ZoneIndexData::fromRequest($request);
+
         $zones = Zone::query()
             ->checkAccess()
+            ->when($data->search, fn ($query) => $query->search($data->search))
             ->with('users')
-            ->paginate($request->input('per_page', 10));
+            ->paginate($data->limit)
+            ->withQueryString();
 
-        $users = User::where('role', Role::OPERATOR->value)
+        $users = User::query()
+            ->operator()
             ->orderBy('name')
             ->get(['id', 'name']);
 
         return inertia('Zones', [
             'zones' => ZoneListResource::collection($zones),
             'users' => $users,
+            'filters' => [
+                'search' => $data->search,
+            ],
         ]);
     }
 
