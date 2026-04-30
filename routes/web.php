@@ -1,10 +1,19 @@
 <?php
 
-use Domain\Robot\Controllers\RobotController;
+use Domain\Robot\Controllers\CreateRobotController;
+use Domain\Robot\Controllers\DeleteRobotController;
+use Domain\Robot\Controllers\GetAllRobotsController;
+use Domain\Robot\Controllers\UpdateRobotController;
 use Domain\Robot\Models\Robot;
-use Domain\User\Controllers\UserController;
+use Domain\User\Controllers\CreateUserController;
+use Domain\User\Controllers\DeleteUserController;
+use Domain\User\Controllers\GetAllUsersController;
+use Domain\User\Controllers\UpdateUserController;
 use Domain\User\Models\User;
-use Domain\Zone\Controllers\ZoneController;
+use Domain\Zone\Controllers\CreateZoneController;
+use Domain\Zone\Controllers\DeleteZoneController;
+use Domain\Zone\Controllers\GetAllZonesController;
+use Domain\Zone\Controllers\UpdateZoneController;
 use Domain\Zone\Models\Zone;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -18,35 +27,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::group(['prefix' => 'users', 'middleware' => ['auth', 'verified']], function () {
-    Route::get('/', [UserController::class, 'index'])
+    Route::get('/', GetAllUsersController::class)
         ->can('viewAny', User::class)->name('users.index');
-    Route::post('/', [UserController::class, 'store'])
+    Route::post('/', CreateUserController::class)
         ->can('create', User::class)->name('users.store');
-    Route::put('/{user}', [UserController::class, 'update'])
+    Route::put('/{user}', UpdateUserController::class)
         ->can('update', 'user')->name('users.update');
-    Route::delete('/{user}', [UserController::class, 'destroy'])
+    Route::delete('/{user}', DeleteUserController::class)
         ->can('delete', 'user')->name('users.destroy');
 });
 
 Route::group(['prefix' => 'zones', 'middleware' => ['auth', 'verified']], function () {
-    Route::get('/', [ZoneController::class, 'index'])
+    Route::get('/', GetAllZonesController::class)
         ->can('viewAny', Zone::class)->name('zones.index');
-    Route::post('/', [ZoneController::class, 'store'])
+    Route::post('/', CreateZoneController::class)
         ->can('create', Zone::class)->name('zones.store');
-    Route::put('/{zone}', [ZoneController::class, 'update'])
+    Route::put('/{zone}', UpdateZoneController::class)
         ->can('update', 'zone')->name('zones.update');
-    Route::delete('/{zone}', [ZoneController::class, 'destroy'])
+    Route::delete('/{zone}', DeleteZoneController::class)
         ->can('delete', 'zone')->name('zones.destroy');
 });
 
 Route::group(['prefix' => 'robots', 'middleware' => ['auth', 'verified']], function () {
-    Route::get('/', [RobotController::class, 'index'])
+    Route::get('/', GetAllRobotsController::class)
         ->can('viewAny', Robot::class)->name('robots.index');
-    Route::post('/', [RobotController::class, 'store'])
+    Route::post('/', CreateRobotController::class)
         ->can('create', Robot::class)->name('robots.store');
-    Route::put('/{robot}', [RobotController::class, 'update'])
+    Route::put('/{robot}', UpdateRobotController::class)
         ->can('update', 'robot')->name('robots.update');
-    Route::delete('/{robot}', [RobotController::class, 'destroy'])
+    Route::delete('/{robot}', DeleteRobotController::class)
         ->can('delete', 'robot')->name('robots.destroy');
 });
 
