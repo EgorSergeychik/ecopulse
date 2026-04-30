@@ -11,7 +11,15 @@ abstract class RobotState extends State
     {
         return parent::config()
             ->default(Offline::class)
-            ->allowAllTransitions()
-            ->ignoreSameState();
+
+            ->allowTransition(Offline::class, Active::class)
+
+            ->allowTransition(Active::class, Error::class)
+            ->allowTransition(Active::class, Maintenance::class)
+
+            ->allowTransition(Error::class, Maintenance::class)
+
+            ->allowTransition(Maintenance::class, Offline::class)
+            ;
     }
 }

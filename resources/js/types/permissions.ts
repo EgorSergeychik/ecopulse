@@ -18,6 +18,7 @@ export enum Permission {
     ViewRobots = 'robots.view',
     CreateRobots = 'robots.create',
     UpdateRobots = 'robots.update',
+    TransitionRobots = 'robots.transition',
     DeleteRobots = 'robots.delete',
 }
 

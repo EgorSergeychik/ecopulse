@@ -4,6 +4,7 @@ import { MapPin, Pencil, Plus, Trash } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
+import RowActionsMenu from '@/components/RowActionsMenu.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTablePagination,
@@ -132,23 +133,31 @@ const deleteZone = (zone: any) => {
             </template>
 
             <template #rightbar="{ row }">
-                <div class="flex flex-col gap-1">
-                    <Button
-                        v-if="can(Permission.UpdateZones)"
-                        variant="outline"
-                        size="icon"
-                        @click="openEditModal(row)"
-                    >
-                        <Pencil class="h-4 w-4" />
-                    </Button>
-                    <Button
-                        v-if="can(Permission.DeleteZones)"
-                        variant="destructive"
-                        size="icon"
-                        @click="deleteZone(row)"
-                    >
-                        <Trash class="h-4 w-4" />
-                    </Button>
+                <div class="flex">
+                    <RowActionsMenu
+                        :menu-label="t('common.actions.open_menu')"
+                        :groups="[
+                            {
+                                items: [
+                                    ...(can(Permission.UpdateZones)
+                                        ? [{
+                                            label: t('common.actions.edit'),
+                                            icon: Pencil,
+                                            onSelect: () => openEditModal(row),
+                                        }]
+                                        : []),
+                                    ...(can(Permission.DeleteZones)
+                                        ? [{
+                                            label: t('common.actions.delete'),
+                                            icon: Trash,
+                                            variant: 'destructive' as const,
+                                            onSelect: () => deleteZone(row),
+                                        }]
+                                        : []),
+                                ],
+                            },
+                        ]"
+                    />
                 </div>
             </template>
 

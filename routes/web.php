@@ -3,6 +3,7 @@
 use Domain\Robot\Controllers\CreateRobotController;
 use Domain\Robot\Controllers\DeleteRobotController;
 use Domain\Robot\Controllers\GetAllRobotsController;
+use Domain\Robot\Controllers\TransitionRobotController;
 use Domain\Robot\Controllers\UpdateRobotController;
 use Domain\Robot\Models\Robot;
 use Domain\User\Controllers\CreateUserController;
@@ -55,6 +56,8 @@ Route::group(['prefix' => 'robots', 'middleware' => ['auth', 'verified']], funct
         ->can('create', Robot::class)->name('robots.store');
     Route::put('/{robot}', UpdateRobotController::class)
         ->can('update', 'robot')->name('robots.update');
+    Route::post('/{robot}/to/{state}', TransitionRobotController::class)
+        ->can('transition', 'robot')->name('robots.transition');
     Route::delete('/{robot}', DeleteRobotController::class)
         ->can('delete', 'robot')->name('robots.destroy');
 });

@@ -34,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
             Permission::UpdateZones,
 
             Permission::ViewRobots,
+            Permission::TransitionRobots,
         );
     }
 

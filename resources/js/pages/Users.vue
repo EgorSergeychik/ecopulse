@@ -4,6 +4,7 @@ import { Pencil, Plus, Trash } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
+import RowActionsMenu from '@/components/RowActionsMenu.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
@@ -103,21 +104,31 @@ const deleteUser = (user: any) => {
                 <span class="font-medium">{{ row.name }}</span>
             </template>
             <template #cell-actions="{ row }">
-                <div class="flex justify-end gap-2">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        @click="openEditModal(row)"
-                    >
-                        <Pencil class="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="destructive"
-                        size="icon"
-                        @click="deleteUser(row)"
-                    >
-                        <Trash class="h-4 w-4" />
-                    </Button>
+                <div class="flex justify-end">
+                    <RowActionsMenu
+                        :menu-label="t('common.actions.open_menu')"
+                        :groups="[
+                            {
+                                items: [
+                                    ...(can(Permission.UpdateUsers)
+                                        ? [{
+                                            label: t('common.actions.edit'),
+                                            icon: Pencil,
+                                            onSelect: () => openEditModal(row),
+                                        }]
+                                        : []),
+                                    ...(can(Permission.DeleteUsers)
+                                        ? [{
+                                            label: t('common.actions.delete'),
+                                            icon: Trash,
+                                            variant: 'destructive' as const,
+                                            onSelect: () => deleteUser(row),
+                                        }]
+                                        : []),
+                                ],
+                            },
+                        ]"
+                    />
                 </div>
             </template>
         </DataTable>

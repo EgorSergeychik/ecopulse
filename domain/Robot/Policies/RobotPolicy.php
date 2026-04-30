@@ -30,6 +30,12 @@ class RobotPolicy
             && $robot->checkAccess($user);
     }
 
+    public function transition(User $user, Robot $robot): bool
+    {
+        return $user->hasPermission(Permission::TransitionRobots)
+            && $robot->checkAccess($user);
+    }
+
     public function delete(User $user, Robot $robot): bool
     {
         return $user->hasPermission(Permission::DeleteRobots)

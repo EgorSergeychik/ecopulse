@@ -23,5 +23,6 @@ enum Permission: string
     case ViewRobots = 'robots.view';
     case CreateRobots = 'robots.create';
     case UpdateRobots = 'robots.update';
+    case TransitionRobots = 'robots.transition';
     case DeleteRobots = 'robots.delete';
 }

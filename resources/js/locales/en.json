@@ -13,6 +13,11 @@
         "buttons": {
             "save": "Save",
             "cancel": "Cancel"
+        },
+        "actions": {
+            "open_menu": "Open actions menu",
+            "edit": "Edit",
+            "delete": "Delete"
         }
     },
     "navigation": {
@@ -110,10 +115,14 @@
                     "zone": "Zone",
                     "status": "Status",
                     "battery_pct": "Battery",
-                    "actions": "Actions",
-                    "created_at": "Created At"
+                    "actions": "Actions"
                 },
                 "empty": "No robots to display"
+            },
+            "actions": {
+                "status_group": "Status",
+                "to_maintenance": "To maintenance",
+                "to_offline": "To offline"
             },
             "modal": {
                 "title": {

@@ -20,7 +20,6 @@ class RobotListResource extends JsonResource
             'status' => $this->status->getValue(),
             'status_label' => __('misc.robots.status.'.$this->status->getValue()),
             'battery_pct' => (float) $this->battery_pct,
-            'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
 }

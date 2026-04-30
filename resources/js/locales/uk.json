@@ -13,6 +13,11 @@
         "buttons": {
             "save": "Зберегти",
             "cancel": "Скасувати"
+        },
+        "actions": {
+            "open_menu": "Відкрити меню дій",
+            "edit": "Редагувати",
+            "delete": "Видалити"
         }
     },
     "navigation": {
@@ -113,10 +118,14 @@
                     "zone": "Зона",
                     "status": "Статус",
                     "battery_pct": "Батарея",
-                    "actions": "Дії",
-                    "created_at": "Дата створення"
+                    "actions": "Дії"
                 },
                 "empty": "Немає роботів для відображення"
+            },
+            "actions": {
+                "status_group": "Статус",
+                "to_maintenance": "На обслуговування",
+                "to_offline": "В офлайн"
             },
             "modal": {
                 "title": {
