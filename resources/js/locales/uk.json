@@ -18,7 +18,8 @@
             "open_menu": "Відкрити меню дій",
             "edit": "Редагувати",
             "delete": "Видалити",
-            "regenerate": "Перевипустити"
+            "regenerate": "Перевипустити",
+            "resolve": "Вирішити"
         }
     },
     "navigation": {
@@ -26,7 +27,9 @@
             "dashboard": "Дашборд",
             "users": "Користувачі",
             "zones": "Зони",
-            "robots": "Роботи"
+            "robots": "Роботи",
+            "telemetry_logs": "Логи",
+            "incidents": "Інциденти"
         },
         "footer": {
             "repository": "Репозиторій"
@@ -152,6 +155,40 @@
                 }
             },
             "confirm_delete": "Ви впевнені, що хочете видалити {name}?"
+        },
+        "telemetry_logs": {
+            "title": "Логи",
+            "description": "Історія телеметричних логів усіх роботів",
+            "table": {
+                "columns": {
+                    "robot": "Робот",
+                    "zone": "Зона",
+                    "lat": "Широта",
+                    "lng": "Довгота",
+                    "battery_pct": "Батарея",
+                    "co2": "CO2",
+                    "noise_level": "Шум",
+                    "recorded_at": "Час запису"
+                },
+                "empty": "Немає логів для відображення"
+            }
+        },
+        "incidents": {
+            "title": "Інциденти",
+            "description": "Історія інцидентів з роботами",
+            "table": {
+                "columns": {
+                    "robot": "Робот",
+                    "zone": "Зона",
+                    "type": "Тип",
+                    "severity": "Критичність",
+                    "description": "Опис",
+                    "created_at": "Створено",
+                    "resolved_at": "Вирішено",
+                    "actions": "Дії"
+                },
+                "empty": "Немає інцидентів для відображення"
+            }
         }
     },
     "user_context": {

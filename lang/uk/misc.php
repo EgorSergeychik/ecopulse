@@ -23,4 +23,23 @@ return [
             \Domain\Robot\Enums\RobotState::MAINTENANCE->value => 'Технічне обслуговування',
         ],
     ],
+    'incidents' => [
+        'types' => [
+            'battery_low' => 'Низький заряд батареї',
+            'co2_high' => 'Високий рівень CO2',
+            'noise_level_high' => 'Високий рівень шуму',
+        ],
+        'severity' => [
+            'warning' => 'Попередження',
+            'critical' => 'Критичний',
+            'fatal' => 'Фатальний',
+        ],
+        'directions' => [
+            'above' => 'вище',
+            'below' => 'нижче',
+        ],
+        'messages' => [
+            'threshold_breach' => ':direction порогу :threshold (фактично: :actual).',
+        ],
+    ],
 ];

@@ -20,6 +20,13 @@ export enum Permission {
     UpdateRobots = 'robots.update',
     TransitionRobots = 'robots.transition',
     DeleteRobots = 'robots.delete',
+
+    // Telemetry
+    ViewTelemetryLogs = 'telemetry-logs.view',
+
+    // Incidents
+    ViewIncidents = 'incidents.view',
+    ResolveIncidents = 'incidents.resolve',
 }
 
 export type PermissionKey = `${Permission}`;

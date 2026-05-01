@@ -20,10 +20,12 @@ const DEFAULT_LOCALE: Language = 'en';
 function getInitialLocale(): Language {
     if (typeof window !== 'undefined') {
         const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
+
         if (stored && SUPPORTED_LANGUAGES.some((l) => l.code === stored)) {
             return stored;
         }
     }
+
     return DEFAULT_LOCALE;
 }
 

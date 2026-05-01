@@ -23,4 +23,23 @@ return [
             \Domain\Robot\Enums\RobotState::MAINTENANCE->value => 'Maintenance',
         ],
     ],
+    'incidents' => [
+        'types' => [
+            'battery_low' => 'Low battery',
+            'co2_high' => 'High CO2',
+            'noise_level_high' => 'High noise level',
+        ],
+        'severity' => [
+            'warning' => 'Warning',
+            'critical' => 'Critical',
+            'fatal' => 'Fatal',
+        ],
+        'directions' => [
+            'above' => 'above',
+            'below' => 'below',
+        ],
+        'messages' => [
+            'threshold_breach' => 'is :direction the threshold :threshold (actual: :actual).',
+        ],
+    ],
 ];

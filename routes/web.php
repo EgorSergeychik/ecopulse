@@ -1,5 +1,8 @@
 <?php
 
+use Domain\Incident\Controllers\GetAllIncidentsController;
+use Domain\Incident\Controllers\ResolveIncidentController;
+use Domain\Incident\Models\Incident;
 use Domain\Robot\Controllers\CreateRobotController;
 use Domain\Robot\Controllers\DeleteRobotController;
 use Domain\Robot\Controllers\GetAllRobotsController;
@@ -7,6 +10,8 @@ use Domain\Robot\Controllers\RegenerateRobotTokenController;
 use Domain\Robot\Controllers\TransitionRobotController;
 use Domain\Robot\Controllers\UpdateRobotController;
 use Domain\Robot\Models\Robot;
+use Domain\Telemetry\Controllers\GetAllTelemetryLogsController;
+use Domain\Telemetry\Models\TelemetryLog;
 use Domain\User\Controllers\CreateUserController;
 use Domain\User\Controllers\DeleteUserController;
 use Domain\User\Controllers\GetAllUsersController;
@@ -63,6 +68,18 @@ Route::group(['prefix' => 'robots', 'middleware' => ['auth', 'verified']], funct
         ->can('transition', 'robot')->name('robots.transition');
     Route::delete('/{robot}', DeleteRobotController::class)
         ->can('delete', 'robot')->name('robots.destroy');
+});
+
+Route::group(['prefix' => 'telemetry-logs', 'middleware' => ['auth', 'verified']], function () {
+    Route::get('/', GetAllTelemetryLogsController::class)
+        ->can('viewAny', TelemetryLog::class)->name('telemetry-logs.index');
+});
+
+Route::group(['prefix' => 'incidents', 'middleware' => ['auth', 'verified']], function () {
+    Route::get('/', GetAllIncidentsController::class)
+        ->can('viewAny', Incident::class)->name('incidents.index');
+    Route::post('/{incident}/resolve', ResolveIncidentController::class)
+        ->can('resolve', 'incident')->name('incidents.resolve');
 });
 
 require __DIR__.'/settings.php';

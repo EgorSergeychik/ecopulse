@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Bot, FolderGit2, LayoutGrid, Map, Users } from 'lucide-vue-next';
+import { Activity, Bot, FolderGit2, LayoutGrid, Map, OctagonAlert, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,8 +15,8 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as users } from '@/routes/users';
 import { index as robots } from '@/routes/robots';
+import { index as users } from '@/routes/users';
 import { index as zones } from '@/routes/zones';
 import type { NavItem } from '@/types';
 import { Permission } from '@/types/permissions';
@@ -44,6 +44,18 @@ const mainNavItems: NavItem[] = [
         href: robots(),
         icon: Bot,
         permission: Permission.ViewRobots,
+    },
+    {
+        title: 'pages.telemetry_logs.title',
+        href: '/telemetry-logs',
+        icon: Activity,
+        permission: Permission.ViewTelemetryLogs,
+    },
+    {
+        title: 'pages.incidents.title',
+        href: '/incidents',
+        icon: OctagonAlert,
+        permission: Permission.ViewIncidents,
     },
 ];
 

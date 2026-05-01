@@ -18,7 +18,8 @@
             "open_menu": "Open actions menu",
             "edit": "Edit",
             "delete": "Delete",
-            "regenerate": "Regenerate"
+            "regenerate": "Regenerate",
+            "resolve": "Resolve"
         }
     },
     "navigation": {
@@ -26,7 +27,9 @@
             "dashboard": "Dashboard",
             "users": "Users",
             "zones": "Zones",
-            "robots": "Robots"
+            "robots": "Robots",
+            "telemetry_logs": "Logs",
+            "incidents": "Incidents"
         },
         "footer": {
             "repository": "Repository"
@@ -149,6 +152,40 @@
                 }
             },
             "confirm_delete": "Are you sure you want to delete {name}?"
+        },
+        "telemetry_logs": {
+            "title": "Logs",
+            "description": "Telemetry logs for all robots",
+            "table": {
+                "columns": {
+                    "robot": "Robot",
+                    "zone": "Zone",
+                    "lat": "Lat",
+                    "lng": "Lng",
+                    "battery_pct": "Battery",
+                    "co2": "CO2",
+                    "noise_level": "Noise",
+                    "recorded_at": "Recorded At"
+                },
+                "empty": "No telemetry logs to display"
+            }
+        },
+        "incidents": {
+            "title": "Incidents",
+            "description": "Robot incident logs",
+            "table": {
+                "columns": {
+                    "robot": "Robot",
+                    "zone": "Zone",
+                    "type": "Type",
+                    "severity": "Severity",
+                    "description": "Description",
+                    "created_at": "Created At",
+                    "resolved_at": "Resolved At",
+                    "actions": "Actions"
+                },
+                "empty": "No incidents to display"
+            }
         }
     },
     "user_context": {

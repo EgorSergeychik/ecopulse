@@ -7,6 +7,7 @@ export function usePermission() {
 
     const can = (permission: Permission | string): boolean => {
         const permissions = page.props.auth?.permissions ?? {};
+
         return !!permissions[permission as keyof typeof permissions];
     };
 

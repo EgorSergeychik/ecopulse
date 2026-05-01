@@ -38,15 +38,27 @@ const toLng  = () => parseFloat(String(props.lng))  || 30.52;
 const toZoom = () => parseInt(String(props.zoom))   || 12;
 
 const capturePolygon = () => {
-    if (!polygonLayer) return;
+    if (!polygonLayer) {
+return;
+}
+
     const rings = polygonLayer.getLatLngs() as L.LatLng[][];
     emit('update:polygon', rings[0].map(ll => ({ lat: ll.lat, lng: ll.lng })));
 };
 
 const drawExistingPolygon = () => {
-    if (!map) return;
-    if (polygonLayer) { polygonLayer.remove(); polygonLayer = null; }
-    if (!props.polygon || props.polygon.length < 3) return;
+    if (!map) {
+return;
+}
+
+    if (polygonLayer) {
+ polygonLayer.remove(); polygonLayer = null; 
+}
+
+    if (!props.polygon || props.polygon.length < 3) {
+return;
+}
+
     polygonLayer = L.polygon(props.polygon.map(p => [p.lat, p.lng] as L.LatLngTuple), {
         color: 'hsl(142 76% 36%)',
         weight: 2,
@@ -56,7 +68,9 @@ const drawExistingPolygon = () => {
 };
 
 onMounted(() => {
-    if (!mapEl.value) return;
+    if (!mapEl.value) {
+return;
+}
 
     map = L.map(mapEl.value).setView([toLat(), toLng()], toZoom());
 
@@ -71,13 +85,17 @@ onMounted(() => {
         const ll = centerMarker!.getLatLng();
         skipMoveEnd = true;
         map!.panTo(ll);
-        map!.once('moveend', () => { skipMoveEnd = false; });
+        map!.once('moveend', () => {
+ skipMoveEnd = false; 
+});
         emit('update:lat', ll.lat.toFixed(8));
         emit('update:lng', ll.lng.toFixed(8));
     });
 
     map.on('moveend', () => {
-        if (skipMoveEnd) return;
+        if (skipMoveEnd) {
+return;
+}
 
         const center = map!.getCenter();
 
@@ -105,7 +123,9 @@ onMounted(() => {
     });
 
     map.on('pm:create', (e: any) => {
-        if (polygonLayer) polygonLayer.remove();
+        if (polygonLayer) {
+polygonLayer.remove();
+}
 
         polygonLayer = e.layer as L.Polygon;
 
@@ -130,14 +150,18 @@ onBeforeUnmount(() => {
 });
 
 watch([() => props.lat, () => props.lng], () => {
-    if (!map || !centerMarker) return;
+    if (!map || !centerMarker) {
+return;
+}
 
     const ll: L.LatLngTuple = [toLat(), toLng()];
 
     centerMarker.setLatLng(ll);
     skipMoveEnd = true;
     map.panTo(ll);
-    map.once('moveend', () => { skipMoveEnd = false; });
+    map.once('moveend', () => {
+ skipMoveEnd = false; 
+});
 });
 
 watch(() => props.zoom, () => map?.setZoom(toZoom()));

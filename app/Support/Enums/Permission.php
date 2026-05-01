@@ -25,4 +25,11 @@ enum Permission: string
     case UpdateRobots = 'robots.update';
     case TransitionRobots = 'robots.transition';
     case DeleteRobots = 'robots.delete';
+
+    // Telemetry
+    case ViewTelemetryLogs = 'telemetry-logs.view';
+
+    // Incidents
+    case ViewIncidents = 'incidents.view';
+    case ResolveIncidents = 'incidents.resolve';
 }

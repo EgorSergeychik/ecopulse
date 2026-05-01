@@ -55,6 +55,7 @@ watch(
             form.name = props.robot.name;
             form.mac_address = props.robot.mac_address ?? '';
             form.zone_id = String(props.robot.zone_id);
+
             return;
         }
 

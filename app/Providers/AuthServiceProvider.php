@@ -5,8 +5,12 @@ namespace App\Providers;
 use App\Support\Enums\Permission;
 use App\Support\Enums\Role;
 use App\Support\RBAC\RoleRegistry;
+use Domain\Incident\Models\Incident;
+use Domain\Incident\Policies\IncidentPolicy;
 use Domain\Robot\Models\Robot;
 use Domain\Robot\Policies\RobotPolicy;
+use Domain\Telemetry\Models\TelemetryLog;
+use Domain\Telemetry\Policies\TelemetryLogPolicy;
 use Domain\User\Models\User;
 use Domain\User\Policies\UserPolicy;
 use Domain\Zone\Models\Zone;
@@ -35,6 +39,10 @@ class AuthServiceProvider extends ServiceProvider
 
             Permission::ViewRobots,
             Permission::TransitionRobots,
+
+            Permission::ViewTelemetryLogs,
+            Permission::ViewIncidents,
+            Permission::ResolveIncidents,
         );
     }
 
@@ -43,5 +51,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Zone::class, ZonePolicy::class);
         Gate::policy(Robot::class, RobotPolicy::class);
+        Gate::policy(TelemetryLog::class, TelemetryLogPolicy::class);
+        Gate::policy(Incident::class, IncidentPolicy::class);
     }
 }

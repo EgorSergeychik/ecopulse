@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { router, usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
-import { onBeforeUnmount, ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Input } from '@/components/ui/input';
 
@@ -15,17 +15,22 @@ const props = withDefaults(defineProps<{
     paramName: 'search',
 });
 
-const page = usePage();
 const { t } = useI18n();
 
 const value = ref(props.modelValue ?? '');
 
-let syncFromProps = false;
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
+const queueSubmit = () => {
+    if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+    }
+
+    debounceTimeout = setTimeout(submit, props.debounceMs);
+};
+
 const submit = () => {
-    const [path, search = ''] = page.url.split('?');
-    const params = new URLSearchParams(search);
+    const params = new URLSearchParams(window.location.search);
     const normalized = value.value.trim();
 
     if (normalized) {
@@ -36,8 +41,7 @@ const submit = () => {
 
     params.delete('page');
 
-    router.visit(path, {
-        data: Object.fromEntries(params.entries()),
+    router.get(window.location.pathname, Object.fromEntries(params.entries()), {
         preserveScroll: true,
         preserveState: true,
         replace: true,
@@ -45,23 +49,21 @@ const submit = () => {
 };
 
 watch(() => props.modelValue, (newValue) => {
-    syncFromProps = true;
-    value.value = newValue ?? '';
+    const normalized = newValue ?? '';
+
+    if (value.value !== normalized) {
+        value.value = normalized;
+    }
 }, { immediate: true });
 
 watch(value, () => {
-    if (syncFromProps) {
-        syncFromProps = false;
-
-        return;
-    }
-
-    if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-    }
-
-    debounceTimeout = setTimeout(submit, props.debounceMs);
+    queueSubmit();
 });
+
+const handlePaste = async () => {
+    await nextTick();
+    queueSubmit();
+};
 
 onBeforeUnmount(() => {
     if (debounceTimeout) {
@@ -78,6 +80,7 @@ onBeforeUnmount(() => {
             type="search"
             class="pl-9"
             :placeholder="t('table.search.placeholder')"
+            @paste="handlePaste"
         />
     </div>
 </template>

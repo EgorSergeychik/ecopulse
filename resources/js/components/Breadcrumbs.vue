@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -9,7 +10,6 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
-import { useI18n } from 'vue-i18n';
 
 type Props = {
     breadcrumbs: BreadcrumbItemType[];

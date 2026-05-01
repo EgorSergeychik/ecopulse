@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        LengthAwarePaginator::defaultView('pagination::default');
+
+        app()->resolving(LengthAwarePaginator::class, function ($paginator) {
+            $paginator->onEachSide(1);
+        });
     }
 
     /**
