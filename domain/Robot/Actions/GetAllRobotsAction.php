@@ -4,18 +4,18 @@ namespace Domain\Robot\Actions;
 
 use Domain\Robot\DTO\RobotIndexData;
 use Domain\Robot\Models\Robot;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Domain\Robot\Queries\RobotQueryBuilder;
 
 class GetAllRobotsAction
 {
-    public function __invoke(RobotIndexData $data): LengthAwarePaginator
+    public function __invoke(RobotIndexData $data): RobotQueryBuilder
     {
         return Robot::query()
             ->checkAccess()
-            ->when($data->search, fn ($query) => $query->search($data->search))
+            ->when($data->search, fn (RobotQueryBuilder $query) => $query->search($data->search))
+            ->when($data->zone_id, fn (RobotQueryBuilder $query) => $query->zoneId($data->zone_id))
             ->with('zone:id,name')
             ->latest()
-            ->paginate($data->limit)
-            ->withQueryString();
+            ;
     }
 }

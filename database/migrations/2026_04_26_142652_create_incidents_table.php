@@ -28,6 +28,11 @@ return new class extends Migration
             $table->text('resolution_note')->nullable();
 
             $table->timestamps();
+
+            $table->index(
+                ['robot_id', 'type', 'resolved_at'],
+                'incidents_robot_type_resolved_at_index'
+            );
         });
     }
 

@@ -18,7 +18,9 @@ class GetAllTelemetryLogsController extends Controller
     public function __invoke(Request $request)
     {
         $data = TelemetryLogIndexData::fromRequest($request);
-        $telemetryLogs = ($this->getAllTelemetryLogs)($data);
+        $telemetryLogs = $data->is_paginated
+            ? ($this->getAllTelemetryLogs)($data)->paginate($data->limit)->withQueryString()
+            : ($this->getAllTelemetryLogs)($data)->get();
 
         return inertia('TelemetryLogs', [
             'telemetryLogs' => TelemetryLogListResource::collection($telemetryLogs),

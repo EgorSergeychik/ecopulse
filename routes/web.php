@@ -1,11 +1,15 @@
 <?php
 
 use Domain\Incident\Controllers\GetAllIncidentsController;
+use Domain\Webots\Controllers\DownloadOsmController;
+use Domain\Webots\Controllers\DownloadWbtController;
+use Domain\Webots\Controllers\WebotsIndexController;
 use Domain\Incident\Controllers\ResolveIncidentController;
 use Domain\Incident\Models\Incident;
 use Domain\Robot\Controllers\CreateRobotController;
 use Domain\Robot\Controllers\DeleteRobotController;
 use Domain\Robot\Controllers\GetAllRobotsController;
+use Domain\Robot\Controllers\GetRobotPathController;
 use Domain\Robot\Controllers\RegenerateRobotTokenController;
 use Domain\Robot\Controllers\TransitionRobotController;
 use Domain\Robot\Controllers\UpdateRobotController;
@@ -20,6 +24,7 @@ use Domain\User\Models\User;
 use Domain\Zone\Controllers\CreateZoneController;
 use Domain\Zone\Controllers\DeleteZoneController;
 use Domain\Zone\Controllers\GetAllZonesController;
+use Domain\Zone\Controllers\GetZoneController;
 use Domain\Zone\Controllers\UpdateZoneController;
 use Domain\Zone\Models\Zone;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +52,8 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth', 'verified']], functi
 Route::group(['prefix' => 'zones', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', GetAllZonesController::class)
         ->can('viewAny', Zone::class)->name('zones.index');
+    Route::get('/{zone}', GetZoneController::class)
+        ->can('view', 'zone')->name('zones.show');
     Route::post('/', CreateZoneController::class)
         ->can('create', Zone::class)->name('zones.store');
     Route::put('/{zone}', UpdateZoneController::class)
@@ -58,6 +65,8 @@ Route::group(['prefix' => 'zones', 'middleware' => ['auth', 'verified']], functi
 Route::group(['prefix' => 'robots', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', GetAllRobotsController::class)
         ->can('viewAny', Robot::class)->name('robots.index');
+    Route::get('/{robot}/path', GetRobotPathController::class)
+        ->can('view', 'robot')->name('robots.path');
     Route::post('/', CreateRobotController::class)
         ->can('create', Robot::class)->name('robots.store');
     Route::put('/{robot}', UpdateRobotController::class)
@@ -80,6 +89,15 @@ Route::group(['prefix' => 'incidents', 'middleware' => ['auth', 'verified']], fu
         ->can('viewAny', Incident::class)->name('incidents.index');
     Route::post('/{incident}/resolve', ResolveIncidentController::class)
         ->can('resolve', 'incident')->name('incidents.resolve');
+});
+
+Route::group(['prefix' => 'webots', 'middleware' => ['auth', 'verified']], function () {
+    Route::get('/', WebotsIndexController::class)
+        ->can('viewAny', Zone::class)->name('webots.index');
+    Route::get('/download/wbt', DownloadWbtController::class)
+        ->can('viewAny', Zone::class)->name('webots.download-wbt');
+    Route::get('/download/osm', DownloadOsmController::class)
+        ->can('viewAny', Zone::class)->name('webots.download');
 });
 
 require __DIR__.'/settings.php';

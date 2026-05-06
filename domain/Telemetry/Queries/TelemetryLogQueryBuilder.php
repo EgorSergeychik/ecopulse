@@ -2,6 +2,7 @@
 
 namespace Domain\Telemetry\Queries;
 
+use Domain\Robot\Queries\RobotQueryBuilder;
 use Domain\User\Queries\UserQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -32,6 +33,13 @@ class TelemetryLogQueryBuilder extends Builder
     {
         return $this->whereHas('robot.zone.users', fn (UserQueryBuilder $query) => $query
             ->where('users.id', $userId)
+        );
+    }
+
+    public function zoneId(int $zoneId): self
+    {
+        return $this->whereHas('robot', fn (RobotQueryBuilder $query) => $query
+            ->where('robots.zone_id', $zoneId)
         );
     }
 

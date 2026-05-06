@@ -85,6 +85,27 @@
                 "lng": "Lng",
                 "zoom": "Zoom"
             },
+            "show": {
+                "description": "Detailed information and controls for the zone",
+                "robots": {
+                    "title": "Robots In Zone",
+                    "empty": "No robots assigned to this zone yet",
+                    "status": "Status",
+                    "battery": "Battery"
+                },
+                "map": {
+                    "latest_co2": "Latest CO2",
+                    "latest_noise": "Latest Noise",
+                    "latest_recorded_at": "Latest Recorded At"
+                },
+                "placeholder": {
+                    "title": "Placeholder",
+                    "description": "Reserved for additional zone widgets."
+                },
+                "logs": {
+                    "title": "Logs"
+                }
+            },
             "modal": {
                 "title": {
                     "create": "Create Zone",
@@ -168,6 +189,21 @@
                     "recorded_at": "Recorded At"
                 },
                 "empty": "No telemetry logs to display"
+            }
+        },
+        "osm_export": {
+            "title": "Webots Export",
+            "description": "Export an area file for the simulation",
+            "download_osm": "Download .osm",
+            "download_wbt": "Download .wbt",
+            "hint": "Draw a rectangle on the map or select a zone to set the export area.",
+            "zones": {
+                "title": "Zones",
+                "empty": "No zones available"
+            },
+            "validation": {
+                "no_rectangle": "Draw a rectangle on the map or select a zone first.",
+                "download_error": "Failed to download the export. Please try again."
             }
         },
         "incidents": {

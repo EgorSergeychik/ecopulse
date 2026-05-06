@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Activity, Bot, FolderGit2, LayoutGrid, Map, OctagonAlert, Users } from 'lucide-vue-next';
+import { Activity, Bot, Download, FolderGit2, LayoutGrid, Map, OctagonAlert, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,6 +15,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as osmExport } from '@/routes/webots';
 import { index as robots } from '@/routes/robots';
 import { index as users } from '@/routes/users';
 import { index as zones } from '@/routes/zones';
@@ -60,6 +61,12 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
+    {
+        title: 'pages.osm_export.title',
+        href: osmExport(),
+        icon: Download,
+        permission: Permission.ViewZones,
+    },
     {
         title: 'navigation.footer.repository',
         href: 'https://github.com/EgorSergeychik/ecopulse',

@@ -20,7 +20,9 @@ class GetAllRobotsController extends Controller
     {
         $data = RobotIndexData::fromRequest($request);
 
-        $robots = ($this->getAllRobots)($data);
+        $robots = $data->is_paginated
+            ? ($this->getAllRobots)($data)->paginate($data->limit)->withQueryString()
+            : ($this->getAllRobots)($data)->get();
         $zones = Zone::query()->checkAccess()->orderBy('name')->get(['id', 'name']);
 
         return inertia('Robots', [

@@ -7,4 +7,8 @@ export interface Robot {
     status: string;
     status_label: string;
     battery_pct: number;
+    lat?: number | null;
+    lng?: number | null;
+    latest_recorded_at?: string | null;
+    latest_metrics?: Record<string, unknown>;
 }

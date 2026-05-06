@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Support\SDK\Overpass\OverpassClient;
+use App\Support\Services\WebotsConverter;
 use Carbon\CarbonImmutable;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Date;
@@ -16,7 +18,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(OverpassClient::class);
+        $this->app->singleton(WebotsConverter::class);
     }
 
     /**

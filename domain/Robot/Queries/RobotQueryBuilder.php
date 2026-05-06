@@ -36,6 +36,11 @@ class RobotQueryBuilder extends Builder
         );
     }
 
+    public function zoneId(int $zoneId): self
+    {
+        return $this->where('robots.zone_id', $zoneId);
+    }
+
     /*
      * Filters
      */

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { MapPin, Pencil, Plus, Trash } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -106,7 +106,12 @@ const deleteZone = (zone: any) => {
             </template>
 
             <template #title="{ row }">
-                <p class="truncate font-semibold">{{ row.name }}</p>
+                <Link
+                    :href="`/zones/${row.id}`"
+                    class="truncate font-semibold transition-colors hover:text-primary"
+                >
+                    {{ row.name }}
+                </Link>
             </template>
 
             <template #body="{ row }">
@@ -140,19 +145,30 @@ const deleteZone = (zone: any) => {
                             {
                                 items: [
                                     ...(can(Permission.UpdateZones)
-                                        ? [{
-                                            label: t('common.actions.edit'),
-                                            icon: Pencil,
-                                            onSelect: () => openEditModal(row),
-                                        }]
+                                        ? [
+                                              {
+                                                  label: t(
+                                                      'common.actions.edit',
+                                                  ),
+                                                  icon: Pencil,
+                                                  onSelect: () =>
+                                                      openEditModal(row),
+                                              },
+                                          ]
                                         : []),
                                     ...(can(Permission.DeleteZones)
-                                        ? [{
-                                            label: t('common.actions.delete'),
-                                            icon: Trash,
-                                            variant: 'destructive' as const,
-                                            onSelect: () => deleteZone(row),
-                                        }]
+                                        ? [
+                                              {
+                                                  label: t(
+                                                      'common.actions.delete',
+                                                  ),
+                                                  icon: Trash,
+                                                  variant:
+                                                      'destructive' as const,
+                                                  onSelect: () =>
+                                                      deleteZone(row),
+                                              },
+                                          ]
                                         : []),
                                 ],
                             },

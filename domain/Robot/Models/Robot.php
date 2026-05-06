@@ -2,19 +2,19 @@
 
 namespace Domain\Robot\Models;
 
+use Domain\Incident\Models\Incident;
 use Domain\Robot\Queries\RobotQueryBuilder;
 use Domain\Robot\States\RobotState;
-use Domain\Incident\Models\Incident;
 use Domain\Telemetry\Models\TelemetryLog;
 use Domain\User\Models\User;
 use Domain\Zone\Models\Zone;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Sanctum\NewAccessToken;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\NewAccessToken;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -56,6 +56,11 @@ class Robot extends Model
     public function telemetryLogs(): HasMany
     {
         return $this->hasMany(TelemetryLog::class);
+    }
+
+    public function latestTelemetryLog(): HasOne
+    {
+        return $this->hasOne(TelemetryLog::class)->latestOfMany('recorded_at');
     }
 
     public function incidents(): HasMany
