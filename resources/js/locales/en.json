@@ -20,6 +20,11 @@
             "delete": "Delete",
             "regenerate": "Regenerate",
             "resolve": "Resolve"
+        },
+        "severity": {
+            "warning": "Warning",
+            "critical": "Critical",
+            "fatal": "Fatal"
         }
     },
     "navigation": {
@@ -37,7 +42,25 @@
     },
     "pages": {
         "dashboard": {
-            "title": "Dashboard"
+            "title": "Dashboard",
+            "stats": {
+                "total_robots": "Total Robots",
+                "active_robots": "Active",
+                "problem_robots": "With Problems",
+                "unresolved_incidents": "Open Incidents"
+            },
+            "problem_robots": {
+                "title": "Robots with Problems",
+                "empty": "No robots with problems"
+            },
+            "recent_incidents": {
+                "title": "Recent Incidents",
+                "empty": "No active incidents"
+            },
+            "charts": {
+                "incident_trend": "Incidents — Last 7 Days",
+                "severity_breakdown": "Open by Severity"
+            }
         },
         "users": {
             "title": "Users",

@@ -20,6 +20,11 @@
             "delete": "Видалити",
             "regenerate": "Перевипустити",
             "resolve": "Вирішити"
+        },
+        "severity": {
+            "warning": "Попередження",
+            "critical": "Критичний",
+            "fatal": "Фатальний"
         }
     },
     "navigation": {
@@ -37,7 +42,25 @@
     },
     "pages": {
         "dashboard": {
-            "title": "Дашборд"
+            "title": "Дашборд",
+            "stats": {
+                "total_robots": "Всього роботів",
+                "active_robots": "Активні",
+                "problem_robots": "З проблемами",
+                "unresolved_incidents": "Відкриті інциденти"
+            },
+            "problem_robots": {
+                "title": "Роботи з проблемами",
+                "empty": "Роботів з проблемами немає"
+            },
+            "recent_incidents": {
+                "title": "Останні інциденти",
+                "empty": "Активних інцидентів немає"
+            },
+            "charts": {
+                "incident_trend": "Інциденти — Останні 7 днів",
+                "severity_breakdown": "Відкриті за критичністю"
+            }
         },
         "users": {
             "title": "Користувачі",

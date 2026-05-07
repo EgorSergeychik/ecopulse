@@ -1,6 +1,7 @@
 <?php
 
 use Domain\Incident\Controllers\GetAllIncidentsController;
+use Domain\Dashboard\Controllers\GetDashboardController;
 use Domain\Webots\Controllers\DownloadOsmController;
 use Domain\Webots\Controllers\DownloadWbtController;
 use Domain\Webots\Controllers\WebotsIndexController;
@@ -36,7 +37,7 @@ Route::get('/', fn () => Inertia::render('Welcome', [
 ]))->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', GetDashboardController::class)->name('dashboard');
 });
 
 Route::group(['prefix' => 'users', 'middleware' => ['auth', 'verified']], function () {

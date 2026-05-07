@@ -18,7 +18,7 @@ class GetAllIncidentsController extends Controller
     public function __invoke(Request $request)
     {
         $data = IncidentIndexData::fromRequest($request);
-        $incidents = ($this->getAllIncidents)($data);
+        $incidents = ($this->getAllIncidents)($data)->paginate($data->limit)->withQueryString();
 
         return inertia('Incidents', [
             'incidents' => IncidentListResource::collection($incidents),

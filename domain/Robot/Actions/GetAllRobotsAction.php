@@ -14,6 +14,7 @@ class GetAllRobotsAction
             ->checkAccess()
             ->when($data->search, fn (RobotQueryBuilder $query) => $query->search($data->search))
             ->when($data->zone_id, fn (RobotQueryBuilder $query) => $query->zoneId($data->zone_id))
+            ->when($data->statuses, fn (RobotQueryBuilder $query) => $query->whereIn('status', $data->statuses))
             ->with('zone:id,name')
             ->latest()
             ;

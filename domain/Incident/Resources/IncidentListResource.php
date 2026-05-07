@@ -14,6 +14,7 @@ class IncidentListResource extends JsonResource
         return [
             'id' => $this->id,
             'robot_name' => $this->robot?->name,
+            'zone_id' => $this->zone_id,
             'zone_name' => $this->zone?->name,
             'type' => $this->type,
             'type_label' => __('misc.incidents.types.'.$this->type),

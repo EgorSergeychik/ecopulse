@@ -13,6 +13,7 @@ class RobotIndexData extends ParentData
         public bool $is_paginated = true,
 
         public ?int $zone_id = null,
+        public ?array $statuses = null,
     ) {}
 
     public static function fromRequest(Request $request): self
