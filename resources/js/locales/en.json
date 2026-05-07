@@ -197,6 +197,27 @@
                 "radiation": { "label": "Radiation", "unit": " µSv/h" }
             }
         },
+        "welcome": {
+            "title": "Urban Environmental Monitoring System Using Simulated Mobile Robotic Complexes.",
+            "subtitle": "Developed by a student of Kyiv Polytechnic Institute as a diploma project.",
+            "login": "Sign In",
+            "register": "Create Account",
+            "go_to_dashboard": "Go to Dashboard",
+            "features": {
+                "telemetry": {
+                    "title": "Real-time Telemetry",
+                    "description": "Track CO₂, PM2.5, noise, radiation, temperature and more — streamed live from every robot in the field."
+                },
+                "zones": {
+                    "title": "Zone Management",
+                    "description": "Define monitoring zones, assign robots, and visualise movement paths on interactive maps."
+                },
+                "incidents": {
+                    "title": "Incident Alerts",
+                    "description": "Automatic detection of threshold breaches with severity levels, history and resolution tracking."
+                }
+            }
+        },
         "osm_export": {
             "title": "Webots Export",
             "description": "Export an area file for the simulation",

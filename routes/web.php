@@ -28,11 +28,12 @@ use Domain\Zone\Controllers\GetZoneController;
 use Domain\Zone\Controllers\UpdateZoneController;
 use Domain\Zone\Models\Zone;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'Welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', fn () => Inertia::render('Welcome', [
+    'canRegister' => Features::enabled(Features::registration()) && !User::exists(),
+]))->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
