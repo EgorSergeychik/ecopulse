@@ -19,56 +19,60 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $superAdmin = User::query()->firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@ecopulse.com'],
             [
-                'name' => 'Test User',
+                'name' => 'Admin',
                 'password' => 'password',
                 'role' => Role::SUPERADMIN,
             ],
         );
 
         $operator = User::query()->firstOrCreate(
-            ['email' => 'operator@example.com'],
+            ['email' => 'operator@ecopulse.com'],
             [
-                'name' => 'Operations User',
+                'name' => 'Zone Operator',
                 'password' => 'password',
                 'role' => Role::OPERATOR,
             ],
         );
 
         $firstZone = Zone::query()->firstOrCreate(
-            ['name' => 'Zone 1'],
+            ['name' => 'Kyiv Center'],
             [
-                'center_lat' => 50.450001,
-                'center_lng' => 30.523333,
+                'center_lat' => 50.450290,
+                'center_lng' => 30.510342,
                 'default_zoom' => 15,
                 'bounding_box' => [
-                    ['lat' => 50.46983064382773, 'lng' => 30.48843383789063],
-                    ['lat' => 50.443163737694626, 'lng' => 30.476074218750004],
-                    ['lat' => 50.43397984872763, 'lng' => 30.54061889648438],
-                    ['lat' => 50.445131482079425, 'lng' => 30.54130554199219],
-                    ['lat' => 50.448192255165054, 'lng' => 30.52482604980469],
-                    ['lat' => 50.463274601689534, 'lng' => 30.518302917480472],
+                    ['lat' => 50.45529088104832, 'lng' => 30.506072044372562],
+                    ['lat' => 50.45425258245089, 'lng' => 30.505943298339847],
+                    ['lat' => 50.44845955100403, 'lng' => 30.492725372314457],
+                    ['lat' => 50.44638263116152, 'lng' => 30.49435615539551],
+                    ['lat' => 50.442228517995694, 'lng' => 30.520234107971195],
+                    ['lat' => 50.44865084166792, 'lng' => 30.522551536560062],
+                    ['lat' => 50.45269509182581, 'lng' => 30.527958869934086],
+                    ['lat' => 50.45835099698138, 'lng' => 30.518260002136234],
                 ],
             ],
         );
 
         $secondZone = Zone::query()->firstOrCreate(
-            ['name' => 'Zone 2'],
+            ['name' => 'Kyiv Politechnic Institute'],
             [
-                'center_lat' => 50.442200,
-                'center_lng' => 30.536800,
+                'center_lat' => 50.449539,
+                'center_lng' => 30.460035,
                 'default_zoom' => 15,
                 'bounding_box' => [
-                    ['lat' => 50.45102333461782, 'lng' => 30.5225944519043],
-                    ['lat' => 50.43513592110541, 'lng' => 30.517444610595707],
-                    ['lat' => 50.42846759165547, 'lng' => 30.551948547363285],
-                    ['lat' => 50.44076534933065, 'lng' => 30.55830001831055],
-                    ['lat' => 50.44545934648414, 'lng' => 30.550918579101566],
-                    ['lat' => 50.44993494435097, 'lng' => 30.539245605468754],
+                    ['lat' => 50.45329623463427, 'lng' => 30.453007221221927],
+                    ['lat' => 50.44672423608348, 'lng' => 30.453114509582523],
+                    ['lat' => 50.44578140050939, 'lng' => 30.462620258331302],
+                    ['lat' => 50.44668324362304, 'lng' => 30.467061996459964],
+                    ['lat' => 50.44884213155844, 'lng' => 30.466053485870365],
+                    ['lat' => 50.451041909716814, 'lng' => 30.46671867370606],
                 ],
             ],
         );
+
+
 
         $operator->zones()->syncWithoutDetaching([$firstZone->id, $secondZone->id]);
         $superAdmin->zones()->syncWithoutDetaching([$firstZone->id, $secondZone->id]);
@@ -103,17 +107,5 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
-        (new TelemetryLogSeeder(
-            countPerRobot: 36,
-            intervalMinutes: 20,
-            hoursBack: 12,
-            includeAlertSpikes: true,
-        ))->run();
-
-        (new IncidentSeeder(
-            count: 14,
-            daysBack: 10,
-            resolvedPercent: 55,
-        ))->run();
     }
 }

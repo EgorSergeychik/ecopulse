@@ -37,14 +37,19 @@ class GenerateTelemetryCommand extends Command
         for ($i = 0; $i < $count; $i++) {
             [$lat, $lng] = $this->randomCoordinate($robot->zone);
 
+            $metrics = collect(config('telemetry.metrics'))
+                ->map(function (array $def): float|int {
+                    $f = $def['fake'];
+                    return $f['type'] === 'float'
+                        ? fake()->randomFloat($f['decimals'] ?? 2, $f['min'], $f['max'])
+                        : fake()->numberBetween($f['min'], $f['max']);
+                })
+                ->all();
+
             $action($robot, new StoreTelemetryData(
                 lat: $lat,
                 lng: $lng,
-                metrics: [
-                    'battery_pct' => fake()->randomFloat(2, 15, 96),
-                    'co2' => fake()->numberBetween(420, 980),
-                    'noise_level' => fake()->numberBetween(38, 82),
-                ],
+                metrics: $metrics,
             ));
 
             $bar->advance();

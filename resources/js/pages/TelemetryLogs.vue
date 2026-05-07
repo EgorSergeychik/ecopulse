@@ -9,6 +9,7 @@ import {
     DataTableSearch,
 } from '@/components/ui/table';
 import type { TableColumn } from '@/components/ui/table';
+import MetricsList from '@/components/MetricsList.vue';
 
 defineProps<{
     telemetryLogs: any;
@@ -33,9 +34,7 @@ const columns = computed<TableColumn[]>(() => [
     { key: 'zone_name', label: t('pages.telemetry_logs.table.columns.zone') },
     { key: 'lat', label: t('pages.telemetry_logs.table.columns.lat') },
     { key: 'lng', label: t('pages.telemetry_logs.table.columns.lng') },
-    { key: 'battery_pct', label: t('pages.telemetry_logs.table.columns.battery_pct') },
-    { key: 'co2', label: t('pages.telemetry_logs.table.columns.co2') },
-    { key: 'noise_level', label: t('pages.telemetry_logs.table.columns.noise_level') },
+    { key: 'metrics', label: t('pages.telemetry_logs.table.columns.metrics') },
     { key: 'recorded_at', label: t('pages.telemetry_logs.table.columns.recorded_at') },
 ]);
 </script>
@@ -61,16 +60,8 @@ const columns = computed<TableColumn[]>(() => [
                 <span class="font-medium">{{ row.robot_name }}</span>
             </template>
 
-            <template #cell-battery_pct="{ row }">
-                <span>{{ Number(row.battery_pct).toFixed(2) }}%</span>
-            </template>
-
-            <template #cell-co2="{ row }">
-                <span>{{ row.co2 ?? '—' }}</span>
-            </template>
-
-            <template #cell-noise_level="{ row }">
-                <span>{{ row.noise_level ?? '—' }}</span>
+            <template #cell-metrics="{ row }">
+                <MetricsList :metrics="row.metrics" />
             </template>
         </DataTable>
 

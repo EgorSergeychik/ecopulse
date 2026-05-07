@@ -5,7 +5,7 @@ import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import { Bot, MapPinned } from 'lucide-vue-next';
+import { Bot, Activity } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
@@ -16,6 +16,8 @@ import echo from '@/echo';
 import { index as zonesIndex } from '@/routes/zones';
 import type { Robot } from '@/types/robot';
 import type { LatLng, Zone } from '@/types/zone';
+import { METRIC_KEYS } from '@/config/telemetry';
+import MetricsList from '@/components/MetricsList.vue';
 
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -30,10 +32,7 @@ interface TelemetryLogRow {
     zone_name: string | null;
     lat: number;
     lng: number;
-    battery_pct: number | null;
-    co2: number | null;
-    noise_level: number | null;
-    metrics: Record<string, unknown>;
+    metrics: Partial<Record<(typeof METRIC_KEYS)[number], number>>;
     recorded_at: string | null;
 }
 
@@ -63,19 +62,8 @@ const columns = computed<TableColumn[]>(() => [
     { key: 'robot_name', label: t('pages.telemetry_logs.table.columns.robot') },
     { key: 'lat', label: t('pages.telemetry_logs.table.columns.lat') },
     { key: 'lng', label: t('pages.telemetry_logs.table.columns.lng') },
-    {
-        key: 'battery_pct',
-        label: t('pages.telemetry_logs.table.columns.battery_pct'),
-    },
-    { key: 'co2', label: t('pages.telemetry_logs.table.columns.co2') },
-    {
-        key: 'noise_level',
-        label: t('pages.telemetry_logs.table.columns.noise_level'),
-    },
-    {
-        key: 'recorded_at',
-        label: t('pages.telemetry_logs.table.columns.recorded_at'),
-    },
+    { key: 'metrics', label: t('pages.telemetry_logs.table.columns.metrics') },
+    { key: 'recorded_at', label: t('pages.telemetry_logs.table.columns.recorded_at') },
 ]);
 
 interface RealtimeRobotPatch {
@@ -164,7 +152,16 @@ const robotMarkerIcon = (robot: Robot) =>
     });
 
 const buildPopupContent = (robot: Robot): string => {
-    const metrics = robot.latest_metrics ?? {};
+    const metrics = (robot.latest_metrics ?? {}) as Record<string, unknown>;
+
+    const metricsHtml = METRIC_KEYS
+        .filter((key) => metrics[key] != null)
+        .map(
+            (key) =>
+                `<div><strong>${t('pages.telemetry_logs.metrics.' + key + '.label')}:</strong> ` +
+                `${formatMetric(metrics[key])}${t('pages.telemetry_logs.metrics.' + key + '.unit')}</div>`,
+        )
+        .join('');
 
     return `
         <div class="space-y-2">
@@ -173,9 +170,7 @@ const buildPopupContent = (robot: Robot): string => {
                 <div style="color:#64748b;font-size:12px;">${robot.status_label}</div>
             </div>
             <div style="font-size:13px;display:grid;gap:4px;">
-                <div><strong>${t('pages.zones.show.robots.battery')}:</strong> ${Number(robot.battery_pct).toFixed(2)}%</div>
-                <div><strong>${t('pages.zones.show.map.latest_co2')}:</strong> ${formatMetric(metrics.co2)}</div>
-                <div><strong>${t('pages.zones.show.map.latest_noise')}:</strong> ${formatMetric(metrics.noise_level)}</div>
+                ${metricsHtml}
                 <div><strong>${t('pages.zones.show.map.latest_recorded_at')}:</strong> ${robot.latest_recorded_at ?? '—'}</div>
             </div>
         </div>
@@ -216,7 +211,11 @@ const drawPath = (robotId: number, points: L.LatLngTuple[]) => {
     if (existing) {
         existing.setLatLngs(points);
     } else {
-        const polyline = L.polyline(points, { color: '#94a3b8', weight: 2, opacity: 0.4 }).addTo(map);
+        const polyline = L.polyline(points, {
+            color: '#94a3b8',
+            weight: 2,
+            opacity: 0.4,
+        }).addTo(map);
         pathLayers.set(robotId, polyline);
     }
 
@@ -230,8 +229,12 @@ const fetchPath = async (robotId: number) => {
     }
 
     const res = await fetch(`/robots/${robotId}/path`);
-    const data: { lat: string | number; lng: string | number }[] = await res.json();
-    const points: L.LatLngTuple[] = data.map((p) => [Number(p.lat), Number(p.lng)]);
+    const data: { lat: string | number; lng: string | number }[] =
+        await res.json();
+    const points: L.LatLngTuple[] = data.map((p) => [
+        Number(p.lat),
+        Number(p.lng),
+    ]);
 
     pathCache.set(robotId, points);
     drawPath(robotId, points);
@@ -324,7 +327,10 @@ const handleRealtimeEvent = (event: {
     });
 
     const newLatLng: L.LatLngTuple = [robot.lat, robot.lng];
-    const patchedRobot = { ...robotsData.value.find((r) => r.id === robot.id)!, ...robot };
+    const patchedRobot = {
+        ...robotsData.value.find((r) => r.id === robot.id)!,
+        ...robot,
+    };
 
     const marker = markerLayers.get(robot.id);
     if (marker && map) {
@@ -345,7 +351,10 @@ onMounted(() => {
     selectedRobotId.value = robotsData.value[0]?.id ?? null;
     initializeMap();
 
-    echo?.private(`zone.${zoneData.value.id}`).listen('.TelemetryLogStored', handleRealtimeEvent);
+    echo?.private(`zone.${zoneData.value.id}`).listen(
+        '.TelemetryLogStored',
+        handleRealtimeEvent,
+    );
 });
 
 onBeforeUnmount(() => {
@@ -430,7 +439,7 @@ watch(selectedRobotId, () => {
 
         <section class="space-y-4">
             <div class="flex items-center gap-2">
-                <MapPinned class="h-4 w-4 text-muted-foreground" />
+                <Activity class="h-4 w-4 text-muted-foreground" />
                 <Heading
                     :title="t('pages.zones.show.logs.title')"
                     variant="small"
@@ -446,20 +455,8 @@ watch(selectedRobotId, () => {
                     <span class="font-medium">{{ row.robot_name ?? '—' }}</span>
                 </template>
 
-                <template #cell-battery_pct="{ row }">
-                    <span>{{
-                        row.battery_pct !== null
-                            ? `${Number(row.battery_pct).toFixed(2)}%`
-                            : '—'
-                    }}</span>
-                </template>
-
-                <template #cell-co2="{ row }">
-                    <span>{{ row.co2 ?? '—' }}</span>
-                </template>
-
-                <template #cell-noise_level="{ row }">
-                    <span>{{ row.noise_level ?? '—' }}</span>
+                <template #cell-metrics="{ row }">
+                    <MetricsList :metrics="row.metrics" />
                 </template>
             </DataTable>
 

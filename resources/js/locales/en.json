@@ -94,8 +94,6 @@
                     "battery": "Battery"
                 },
                 "map": {
-                    "latest_co2": "Latest CO2",
-                    "latest_noise": "Latest Noise",
                     "latest_recorded_at": "Latest Recorded At"
                 },
                 "placeholder": {
@@ -183,12 +181,20 @@
                     "zone": "Zone",
                     "lat": "Lat",
                     "lng": "Lng",
-                    "battery_pct": "Battery",
-                    "co2": "CO2",
-                    "noise_level": "Noise",
+                    "metrics": "Metrics",
                     "recorded_at": "Recorded At"
                 },
                 "empty": "No telemetry logs to display"
+            },
+            "metrics": {
+                "battery_pct": { "label": "Battery", "unit": "%" },
+                "co2": { "label": "CO₂", "unit": " ppm" },
+                "noise_level": { "label": "Noise", "unit": " dB" },
+                "pm25": { "label": "PM2.5", "unit": " µg/m³" },
+                "temperature": { "label": "Temperature", "unit": "°C" },
+                "humidity": { "label": "Humidity", "unit": "%" },
+                "aqi": { "label": "AQI", "unit": "" },
+                "radiation": { "label": "Radiation", "unit": " µSv/h" }
             }
         },
         "osm_export": {

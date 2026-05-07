@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use Domain\Incident\Enums\IncidentOperator;
+use Domain\Incident\Enums\IncidentSeverity;
 use Domain\Robot\Models\Robot;
 use Domain\Telemetry\Models\TelemetryLog;
 use Illuminate\Database\Seeder;
@@ -13,14 +15,6 @@ class TelemetryLogSeeder extends Seeder
         private readonly int $intervalMinutes = 30,
         private readonly int $hoursBack = 24,
         private readonly bool $includeAlertSpikes = true,
-        private readonly array $metricRanges = [
-            'battery_min' => 8,
-            'battery_max' => 96,
-            'co2_min' => 420,
-            'co2_max' => 980,
-            'noise_min' => 38,
-            'noise_max' => 82,
-        ],
     ) {}
 
     public function run(): void
@@ -38,63 +32,91 @@ class TelemetryLogSeeder extends Seeder
 
             for ($index = 0; $index < $this->countPerRobot; $index++) {
                 $recordedAt = (clone $baseTime)->addMinutes($index * $this->intervalMinutes);
-                $battery = $this->batteryValue($index);
-                $co2 = $this->metricValue('co2_min', 'co2_max');
-                $noiseLevel = $this->metricValue('noise_min', 'noise_max');
-
-                if ($this->includeAlertSpikes && $index > 0 && $index % 9 === 0) {
-                    $co2 = fake()->numberBetween(1050, 1550);
-                }
-
-                if ($this->includeAlertSpikes && $index > 0 && $index % 13 === 0) {
-                    $noiseLevel = fake()->numberBetween(86, 104);
-                }
-
-                if ($this->includeAlertSpikes && $index >= $this->countPerRobot - 3) {
-                    $battery = fake()->randomFloat(2, 4, 9.8);
-                }
-
-                $latestBattery = $battery;
+                $metrics = $this->buildMetrics($index);
+                $latestBattery = $metrics['battery_pct'];
 
                 $records[] = [
-                    'robot_id' => $robot->id,
-                    'lat' => $this->coordinateOffset((float) $robot->zone->center_lat, 0.0018, 6),
-                    'lng' => $this->coordinateOffset((float) $robot->zone->center_lng, 0.0024, 6),
-                    'metrics' => json_encode([
-                        'battery_pct' => $battery,
-                        'co2' => $co2,
-                        'noise_level' => $noiseLevel,
-                    ], JSON_THROW_ON_ERROR),
+                    'robot_id'    => $robot->id,
+                    'lat'         => $this->coordinateOffset((float) $robot->zone->center_lat, 0.0018, 6),
+                    'lng'         => $this->coordinateOffset((float) $robot->zone->center_lng, 0.0024, 6),
+                    'metrics'     => json_encode($metrics, JSON_THROW_ON_ERROR),
                     'recorded_at' => $recordedAt,
-                    'created_at' => $recordedAt,
-                    'updated_at' => $recordedAt,
+                    'created_at'  => $recordedAt,
+                    'updated_at'  => $recordedAt,
                 ];
             }
 
             TelemetryLog::query()->insert($records);
 
-            $robot->update([
-                'battery_pct' => $latestBattery,
-            ]);
+            $robot->update(['battery_pct' => $latestBattery]);
+        }
+    }
+
+    private function buildMetrics(int $index): array
+    {
+        $metrics = collect(config('telemetry.metrics'))
+            ->map(function (array $def, string $key) use ($index): float|int {
+                if ($key === 'battery_pct') {
+                    return $this->batteryValue($index);
+                }
+                $f = $def['fake'];
+                return $f['type'] === 'float'
+                    ? fake()->randomFloat($f['decimals'] ?? 2, $f['min'], $f['max'])
+                    : fake()->numberBetween($f['min'], $f['max']);
+            })
+            ->all();
+
+        if ($this->includeAlertSpikes) {
+            $this->applySpikes($metrics, $index);
+        }
+
+        return $metrics;
+    }
+
+    private function applySpikes(array &$metrics, int $index): void
+    {
+        $warningRules = collect(config('incidents.rules'))
+            ->filter(fn($r) => $r['severity'] === IncidentSeverity::WARNING->value)
+            ->groupBy(fn($r) => str($r['field'])->after('metrics.')->value());
+
+        // Periodically spike metrics that have a "higher" threshold
+        $higherRules = $warningRules->filter(
+            fn($rules) => $rules->first()['operator'] === IncidentOperator::HIGHER->value,
+        );
+
+        if ($higherRules->isNotEmpty() && $index > 0) {
+            $period = (int) round($this->countPerRobot / $higherRules->count());
+            if ($period > 0 && $index % $period === 0) {
+                $key = $higherRules->keys()->get((intdiv($index, $period) - 1) % $higherRules->count());
+                if ($key !== null && array_key_exists($key, $metrics)) {
+                    $threshold = $higherRules[$key]->first()['value'];
+                    $metrics[$key] = fake()->randomFloat(2, $threshold * 1.05, $threshold * 1.4);
+                }
+            }
+        }
+
+        // Spike "lower" metrics (e.g. battery) near the end of the sequence
+        $lowerRules = $warningRules->filter(
+            fn($rules) => $rules->first()['operator'] === IncidentOperator::LOWER->value,
+        );
+
+        if ($lowerRules->isNotEmpty() && $index >= $this->countPerRobot - 3) {
+            foreach ($lowerRules as $key => $rules) {
+                if (array_key_exists($key, $metrics)) {
+                    $threshold = $rules->first()['value'];
+                    $metrics[$key] = fake()->randomFloat(2, max(0, $threshold * 0.4), max(0.5, $threshold * 0.95));
+                }
+            }
         }
     }
 
     private function batteryValue(int $index): float
     {
-        $min = $this->metricRanges['battery_min'];
-        $max = $this->metricRanges['battery_max'];
-        $drainPerRecord = ($max - $min) / max($this->countPerRobot, 1);
-        $baseline = $max - ($index * $drainPerRecord);
+        $f = config('telemetry.metrics.battery_pct.fake');
+        $drainPerRecord = ($f['max'] - $f['min']) / max($this->countPerRobot, 1);
+        $baseline = $f['max'] - ($index * $drainPerRecord);
 
-        return round(max($min, $baseline + fake()->randomFloat(2, -4, 3)), 2);
-    }
-
-    private function metricValue(string $minKey, string $maxKey): int
-    {
-        return fake()->numberBetween(
-            $this->metricRanges[$minKey],
-            $this->metricRanges[$maxKey],
-        );
+        return round(max($f['min'], $baseline + fake()->randomFloat(2, -4, 3)), 2);
     }
 
     private function coordinateOffset(float $origin, float $delta, int $precision): float

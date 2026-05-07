@@ -11,16 +11,18 @@ class TelemetryLogListResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $keys = array_keys(config('telemetry.metrics'));
+
         return [
-            'id' => $this->id,
+            'id'         => $this->id,
             'robot_name' => $this->robot?->name,
-            'zone_name' => $this->robot?->zone?->name,
-            'lat' => (float) $this->lat,
-            'lng' => (float) $this->lng,
-            'battery_pct' => data_get($this->metrics, 'battery_pct'),
-            'co2' => data_get($this->metrics, 'co2'),
-            'noise_level' => data_get($this->metrics, 'noise_level'),
-            'metrics' => $this->metrics,
+            'zone_name'  => $this->robot?->zone?->name,
+            'lat'        => (float) $this->lat,
+            'lng'        => (float) $this->lng,
+            'metrics'    => collect($keys)
+                ->mapWithKeys(fn (string $key) => [$key => data_get($this->metrics, $key)])
+                ->filter(fn ($v) => $v !== null)
+                ->all(),
             'recorded_at' => $this->recorded_at?->toDateTimeString(),
         ];
     }

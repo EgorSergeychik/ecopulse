@@ -56,7 +56,7 @@ class IncidentSeeder extends Seeder
                     'lng' => $this->coordinateOffset((float) $robot->zone->center_lng, 0.0028, 6),
                 ],
                 'metrics' => [
-                    $rule['field'] === 'battery_pct' ? 'battery_pct' : str($rule['field'])->after('metrics.')->value() => $actualValue,
+                    str($rule['field'])->after('metrics.')->value() => $actualValue,
                 ],
                 'threshold' => $rule['value'],
                 'operator' => $operator->value,

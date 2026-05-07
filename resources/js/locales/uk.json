@@ -97,8 +97,6 @@
                     "battery": "Батарея"
                 },
                 "map": {
-                    "latest_co2": "Останній CO2",
-                    "latest_noise": "Останній шум",
                     "latest_recorded_at": "Останній час запису"
                 },
                 "logs": {
@@ -182,12 +180,20 @@
                     "zone": "Зона",
                     "lat": "Широта",
                     "lng": "Довгота",
-                    "battery_pct": "Батарея",
-                    "co2": "CO2",
-                    "noise_level": "Шум",
+                    "metrics": "Метрики",
                     "recorded_at": "Час запису"
                 },
                 "empty": "Немає логів для відображення"
+            },
+            "metrics": {
+                "battery_pct": { "label": "Батарея", "unit": "%" },
+                "co2": { "label": "CO₂", "unit": " ppm" },
+                "noise_level": { "label": "Шум", "unit": " дБ" },
+                "pm25": { "label": "Дрібнодисперсний пил", "unit": " мкг/м³" },
+                "temperature": { "label": "Температура", "unit": "°C" },
+                "humidity": { "label": "Вологість", "unit": "%" },
+                "aqi": { "label": "Індекс якості повітря", "unit": "" },
+                "radiation": { "label": "Радіаційний фон", "unit": " мкЗв/год" }
             }
         },
         "osm_export": {

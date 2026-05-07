@@ -23,7 +23,12 @@ class WebotsConverter
             $osmContent = preg_replace('/(<osm\b[^>]*>)/', "$1\n  {$bounds}", $osmContent);
         }
 
-        $osmFile = tempnam(sys_get_temp_dir(), 'ecopulse_') . '.osm';
+        $tempDir = storage_path('app/temp');
+        if (! is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        $osmFile = tempnam($tempDir, 'ecopulse_') . '.osm';
         $wbtFile = substr($osmFile, 0, -4) . '.wbt';
 
         try {

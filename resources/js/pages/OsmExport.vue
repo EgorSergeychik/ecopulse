@@ -13,7 +13,7 @@ import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
 import SideListPanel from '@/components/SideListPanel.vue';
 import { Button } from '@/components/ui/button';
-import { download as downloadRoute } from '@/routes/osm-export';
+import { download as downloadRoute } from '@/routes/webots';
 import type { Zone } from '@/types/zone';
 
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
