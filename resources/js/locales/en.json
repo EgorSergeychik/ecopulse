@@ -168,9 +168,12 @@
             "actions": {
                 "token_group": "Token",
                 "status_group": "Status",
+                "webots_group": "Webots",
                 "regenerate_token": "Regenerate",
                 "to_maintenance": "To maintenance",
-                "to_offline": "To offline"
+                "to_offline": "To offline",
+                "generate_controller": "Download Controller",
+                "controller_unavailable": "Could not fetch map data. Please try again later"
             },
             "token_dialog": {
                 "title": "Robot access token",

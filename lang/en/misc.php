@@ -11,6 +11,7 @@ return [
         \App\Support\Enums\Role::OPERATOR->value => 'Operator',
     ],
     'robots' => [
+        'controller_unavailable' => 'Could not fetch map data. Please try again later.',
         'errors' => [
             'invalid_status' => 'The requested robot status is invalid.',
             'transition_not_allowed' => 'The requested robot status transition is not allowed.',

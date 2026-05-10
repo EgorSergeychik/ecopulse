@@ -23,4 +23,20 @@ class OverpassClient
             ->throw()
             ->body();
     }
+
+    public function fetchHighwaysBbox(float $south, float $west, float $north, float $east): array
+    {
+        $query = "[out:json][timeout:60];\nway[highway]({$south},{$west},{$north},{$east});\nout body;\n>;\nout skel qt;";
+
+        return Http::timeout(120)
+            ->withHeaders([
+                'Accept'     => 'application/json',
+                'User-Agent' => 'EcoPulse/1.0 (environmental monitoring; sergeychike.egor@gmail.com )',
+            ])
+            ->withOptions(['curl' => [CURLOPT_IGNORE_CONTENT_LENGTH => true]])
+            ->asForm()
+            ->post(self::BASE_URL, ['data' => $query])
+            ->throw()
+            ->json() ?? [];
+    }
 }

@@ -167,9 +167,12 @@
             "actions": {
                 "token_group": "Токен",
                 "status_group": "Статус",
+                "webots_group": "Webots",
                 "regenerate_token": "Перевипустити",
                 "to_maintenance": "На обслуговування",
-                "to_offline": "В офлайн"
+                "to_offline": "В офлайн",
+                "generate_controller": "Завантажити контролер",
+                "controller_unavailable": "Не вдалося отримати дані карти. Спробуйте пізніше"
             },
             "token_dialog": {
                 "title": "Токен доступу робота",

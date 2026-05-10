@@ -3,6 +3,7 @@
 use Domain\Incident\Controllers\GetAllIncidentsController;
 use Domain\Dashboard\Controllers\GetDashboardController;
 use Domain\Webots\Controllers\DownloadOsmController;
+use Domain\Webots\Controllers\GenerateRobotControllerController;
 use Domain\Webots\Controllers\DownloadWbtController;
 use Domain\Webots\Controllers\WebotsIndexController;
 use Domain\Incident\Controllers\ResolveIncidentController;
@@ -79,6 +80,8 @@ Route::group(['prefix' => 'robots', 'middleware' => ['auth', 'verified']], funct
         ->can('transition', 'robot')->name('robots.transition');
     Route::delete('/{robot}', DeleteRobotController::class)
         ->can('delete', 'robot')->name('robots.destroy');
+    Route::get('/{robot}/controller', GenerateRobotControllerController::class)
+        ->name('robots.controller');
 });
 
 Route::group(['prefix' => 'telemetry-logs', 'middleware' => ['auth', 'verified']], function () {

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static string fetchBbox(float $south, float $west, float $north, float $east)
+ * @method static array fetchHighwaysBbox(float $south, float $west, float $north, float $east)
  */
 class OverpassFacade extends Facade
 {

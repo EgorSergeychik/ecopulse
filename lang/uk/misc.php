@@ -11,6 +11,7 @@ return [
         \App\Support\Enums\Role::OPERATOR->value => 'Оператор',
     ],
     'robots' => [
+        'controller_unavailable' => 'Не вдалося отримати дані карти. Спробуйте пізніше.',
         'errors' => [
             'invalid_status' => 'Запитаний статус робота некоректний.',
             'transition_not_allowed' => 'Запитаний перехід статусу робота недозволений.',

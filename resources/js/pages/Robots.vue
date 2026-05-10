@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
-import { KeyRound, Pencil, Plus, Power, RefreshCw, Trash, TriangleAlert, Wrench } from 'lucide-vue-next';
+import { Download, KeyRound, Pencil, Plus, Power, RefreshCw, Trash, TriangleAlert, Wrench } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { toast } from 'vue-sonner';
 import Heading from '@/components/Heading.vue';
 import RobotFormModal from '@/components/robots/RobotFormModal.vue';
 import RowActionsMenu from '@/components/RowActionsMenu.vue';
@@ -125,6 +126,24 @@ const transitionRobot = (robot: Robot) => {
 };
 
 const isLowBattery = (robot: Robot): boolean => Number(robot.battery_pct) < 10;
+
+const downloadController = async (robot: Robot) => {
+    const resp = await fetch(`/robots/${robot.id}/controller`);
+
+    if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        toast.error(data.message ?? t('pages.robots.actions.controller_unavailable'));
+        return;
+    }
+
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'robot_controller.py';
+    a.click();
+    URL.revokeObjectURL(url);
+};
 
 const transitionLabel = (robot: Robot): string => {
     const state = nextTransitionState(robot);
@@ -273,6 +292,16 @@ watch(
                                                 : Power,
                                         variant: isLowBattery(row) ? 'destructive' as const : 'default' as const,
                                         onSelect: () => transitionRobot(row),
+                                    }]
+                                    : [],
+                            },
+                            {
+                                label: t('pages.robots.actions.webots_group'),
+                                items: canAction(Permission.UpdateRobots)
+                                    ? [{
+                                        label: t('pages.robots.actions.generate_controller'),
+                                        icon: Download,
+                                        onSelect: () => downloadController(row),
                                     }]
                                     : [],
                             },
