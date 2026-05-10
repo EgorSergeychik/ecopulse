@@ -26,6 +26,7 @@ use Domain\User\Models\User;
 use Domain\Zone\Controllers\CreateZoneController;
 use Domain\Zone\Controllers\DeleteZoneController;
 use Domain\Zone\Controllers\GetAllZonesController;
+use Domain\Zone\Controllers\GetZoneHeatmapSnapshotController;
 use Domain\Zone\Controllers\GetZoneController;
 use Domain\Zone\Controllers\UpdateZoneController;
 use Domain\Zone\Models\Zone;
@@ -57,6 +58,8 @@ Route::group(['prefix' => 'zones', 'middleware' => ['auth', 'verified']], functi
         ->can('viewAny', Zone::class)->name('zones.index');
     Route::get('/{zone}', GetZoneController::class)
         ->can('view', 'zone')->name('zones.show');
+    Route::get('/{zone}/heatmap', GetZoneHeatmapSnapshotController::class)
+        ->can('view', 'zone')->name('zones.heatmap');
     Route::post('/', CreateZoneController::class)
         ->can('create', Zone::class)->name('zones.store');
     Route::put('/{zone}', UpdateZoneController::class)

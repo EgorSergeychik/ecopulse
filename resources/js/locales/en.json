@@ -109,7 +109,7 @@
                 "zoom": "Zoom"
             },
             "show": {
-                "description": "Detailed information and controls for the zone",
+                "description": "Territory of the corresponding monitoring zone",
                 "robots": {
                     "title": "Robots In Zone",
                     "empty": "No robots assigned to this zone yet",
@@ -117,7 +117,26 @@
                     "battery": "Battery"
                 },
                 "map": {
-                    "latest_recorded_at": "Latest Recorded At"
+                    "latest_recorded_at": "Latest Recorded At",
+                    "description": "Inspect live robot positions in real time.",
+                    "paths_description": "Review robot movement paths across the zone.",
+                    "modes": {
+                        "robots": "Robots",
+                        "paths": "Paths",
+                        "heatmap": "Heatmap"
+                    }
+                },
+                "heatmap": {
+                    "description": "Spatial distribution based on the latest telemetry records in the zone.",
+                    "metric_placeholder": "Select metric",
+                    "refresh": "Refresh",
+                    "legend": "Intensity",
+                    "fetch_error": "Could not build the heatmap. Please try again.",
+                    "popup": {
+                        "value": "Average value",
+                        "samples": "Log samples",
+                        "recorded_at": "Newest sample"
+                    }
                 },
                 "placeholder": {
                     "title": "Placeholder",

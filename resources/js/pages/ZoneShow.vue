@@ -5,19 +5,35 @@ import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import { Bot, Activity } from 'lucide-vue-next';
+import {
+    Activity,
+    Bot,
+    Map as MapIcon,
+    RefreshCw,
+    Route,
+    ThermometerSun,
+} from 'lucide-vue-next';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Heading from '@/components/Heading.vue';
+import MetricsList from '@/components/MetricsList.vue';
 import SideListPanel from '@/components/SideListPanel.vue';
+import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { DataTable, DataTablePagination } from '@/components/ui/table';
 import type { TableColumn } from '@/components/ui/table';
+import { METRIC_KEYS } from '@/config/telemetry';
+import type { MetricKey } from '@/config/telemetry';
 import echo from '@/echo';
 import { index as zonesIndex } from '@/routes/zones';
 import type { Robot } from '@/types/robot';
 import type { LatLng, Zone } from '@/types/zone';
-import { METRIC_KEYS } from '@/config/telemetry';
-import MetricsList from '@/components/MetricsList.vue';
 
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -35,6 +51,36 @@ interface TelemetryLogRow {
     metrics: Partial<Record<(typeof METRIC_KEYS)[number], number>>;
     recorded_at: string | null;
 }
+
+interface HeatmapPoint {
+    lat: number;
+    lng: number;
+    value: number;
+    count: number;
+    intensity: number;
+    recorded_at: string | null;
+}
+
+interface HeatmapSnapshot {
+    metric: HeatmapMetric;
+    limit: number;
+    cell_size_m: number;
+    sample_count: number;
+    cell_count: number;
+    stats: {
+        min: number | null;
+        max: number | null;
+    };
+    points: HeatmapPoint[];
+    generated_at: string;
+}
+
+type HeatmapMetric = Exclude<MetricKey, 'battery_pct'>;
+type MapMode = 'robots' | 'paths' | 'heatmap';
+
+const HEATMAP_METRIC_KEYS = METRIC_KEYS.filter(
+    (metric): metric is HeatmapMetric => metric !== 'battery_pct',
+);
 
 const props = defineProps<{
     zone: Zone | { data: Zone };
@@ -63,7 +109,10 @@ const columns = computed<TableColumn[]>(() => [
     { key: 'lat', label: t('pages.telemetry_logs.table.columns.lat') },
     { key: 'lng', label: t('pages.telemetry_logs.table.columns.lng') },
     { key: 'metrics', label: t('pages.telemetry_logs.table.columns.metrics') },
-    { key: 'recorded_at', label: t('pages.telemetry_logs.table.columns.recorded_at') },
+    {
+        key: 'recorded_at',
+        label: t('pages.telemetry_logs.table.columns.recorded_at'),
+    },
 ]);
 
 interface RealtimeRobotPatch {
@@ -84,26 +133,57 @@ const robotPatches = ref<Map<number, RealtimeRobotPatch>>(new Map());
 const realtimeLogs = ref<TelemetryLogRow[]>([]);
 const robotsData = computed<Robot[]>(() => {
     const base = Array.isArray(props.robots) ? props.robots : props.robots.data;
-    if (robotPatches.value.size === 0) return base;
+
+    if (robotPatches.value.size === 0) {
+        return base;
+    }
+
     return base.map((r) => {
         const patch = robotPatches.value.get(r.id);
+
         return patch ? { ...r, ...patch } : r;
     });
 });
 const logsData = computed<TelemetryLogRow[]>(() => {
     const seen = new Set(realtimeLogs.value.map((l) => l.id));
+
     return [
         ...realtimeLogs.value,
         ...props.telemetryLogs.data.filter((l) => !seen.has(l.id)),
     ];
 });
 const selectedRobotId = ref<number | null>(null);
+const mapMode = ref<MapMode>('robots');
+const heatmapMetric = ref<HeatmapMetric>('pm25');
+const heatmapSnapshot = ref<HeatmapSnapshot | null>(null);
+const isHeatmapLoading = ref(false);
+const heatmapError = ref<string | null>(null);
+const isHeatmapStale = ref(false);
 
 let map: L.Map | null = null;
 let zoneLayer: L.Polygon | null = null;
+let heatmapLayer: L.LayerGroup | null = null;
 const markerLayers = new Map<number, L.Marker>();
 const pathLayers = new Map<number, L.Polyline>();
 const pathCache = new Map<number, L.LatLngTuple[]>();
+
+const heatmapMetricLabel = computed(() =>
+    t(`pages.telemetry_logs.metrics.${heatmapMetric.value}.label`),
+);
+const heatmapMetricUnit = computed(() =>
+    t(`pages.telemetry_logs.metrics.${heatmapMetric.value}.unit`),
+);
+const mapDescription = computed(() => {
+    if (mapMode.value === 'heatmap') {
+        return t('pages.zones.show.heatmap.description');
+    }
+
+    if (mapMode.value === 'paths') {
+        return t('pages.zones.show.map.paths_description');
+    }
+
+    return t('pages.zones.show.map.description');
+});
 
 const formatMetric = (value: unknown): string => {
     if (value === null || value === undefined || value === '') {
@@ -115,6 +195,14 @@ const formatMetric = (value: unknown): string => {
     }
 
     return String(value);
+};
+
+const formatHeatmapValue = (value: number | null): string => {
+    if (value == null) {
+        return '—';
+    }
+
+    return formatMetric(value) + heatmapMetricUnit.value;
 };
 
 const robotStatusClass = (status: string): string => {
@@ -154,8 +242,7 @@ const robotMarkerIcon = (robot: Robot) =>
 const buildPopupContent = (robot: Robot): string => {
     const metrics = (robot.latest_metrics ?? {}) as Record<string, unknown>;
 
-    const metricsHtml = METRIC_KEYS
-        .filter((key) => metrics[key] != null)
+    const metricsHtml = METRIC_KEYS.filter((key) => metrics[key] != null)
         .map(
             (key) =>
                 `<div><strong>${t('pages.telemetry_logs.metrics.' + key + '.label')}:</strong> ` +
@@ -175,6 +262,69 @@ const buildPopupContent = (robot: Robot): string => {
             </div>
         </div>
     `;
+};
+
+const heatmapColor = (intensity: number): string => {
+    const hue = 210 - Math.round(Math.max(0, Math.min(1, intensity)) * 210);
+    const lightness = 62 - Math.round(Math.max(0, Math.min(1, intensity)) * 24);
+
+    return `hsl(${hue}, 88%, ${lightness}%)`;
+};
+
+const ensureHeatmapLayer = (): L.LayerGroup | null => {
+    if (!map) {
+        return null;
+    }
+
+    if (!heatmapLayer) {
+        heatmapLayer = L.layerGroup();
+    }
+
+    return heatmapLayer;
+};
+
+const syncLayerVisibility = () => {
+    if (!map) {
+        return;
+    }
+
+    const showRobots = mapMode.value !== 'heatmap';
+    const showPaths = mapMode.value === 'paths';
+    const showHeatmap = mapMode.value === 'heatmap';
+
+    markerLayers.forEach((marker) => {
+        const isOnMap = map!.hasLayer(marker);
+
+        if (showRobots && !isOnMap) {
+            marker.addTo(map!);
+        } else if (!showRobots && isOnMap) {
+            marker.remove();
+        }
+    });
+
+    pathLayers.forEach((polyline) => {
+        const isOnMap = map!.hasLayer(polyline);
+
+        if (showPaths && !isOnMap) {
+            polyline.addTo(map!);
+        } else if (!showPaths && isOnMap) {
+            polyline.remove();
+        }
+    });
+
+    const layer = ensureHeatmapLayer();
+
+    if (!layer) {
+        return;
+    }
+
+    const heatmapIsOnMap = map.hasLayer(layer);
+
+    if (showHeatmap && !heatmapIsOnMap) {
+        layer.addTo(map);
+    } else if (!showHeatmap && heatmapIsOnMap) {
+        layer.remove();
+    }
 };
 
 const refreshPolylineStyles = () => {
@@ -215,16 +365,18 @@ const drawPath = (robotId: number, points: L.LatLngTuple[]) => {
             color: '#94a3b8',
             weight: 2,
             opacity: 0.4,
-        }).addTo(map);
+        });
         pathLayers.set(robotId, polyline);
     }
 
     refreshPolylineStyles();
+    syncLayerVisibility();
 };
 
 const fetchPath = async (robotId: number) => {
     if (pathCache.has(robotId)) {
         drawPath(robotId, pathCache.get(robotId)!);
+
         return;
     }
 
@@ -240,7 +392,15 @@ const fetchPath = async (robotId: number) => {
     drawPath(robotId, points);
 };
 
-const focusRobot = async (robotId: number, openPopup = false) => {
+const focusRobot = async (
+    robotId: number,
+    openPopup = false,
+    switchToPathMode = false,
+) => {
+    if (switchToPathMode) {
+        mapMode.value = 'paths';
+    }
+
     selectedRobotId.value = robotId;
     refreshPolylineStyles();
 
@@ -248,13 +408,103 @@ const focusRobot = async (robotId: number, openPopup = false) => {
 
     if (marker && map) {
         map.panTo(marker.getLatLng(), { animate: true });
+    } else if (map) {
+        const robot = robotsData.value.find((item) => item.id === robotId);
+
+        if (robot?.lat != null && robot?.lng != null) {
+            map.panTo([Number(robot.lat), Number(robot.lng)], {
+                animate: true,
+            });
+        }
     }
 
-    if (openPopup && marker) {
+    if (openPopup && marker && mapMode.value !== 'heatmap') {
         marker.openPopup();
     }
 
-    await fetchPath(robotId);
+    if (mapMode.value === 'paths' || switchToPathMode) {
+        await fetchPath(robotId);
+    }
+};
+
+const clearHeatmap = () => {
+    ensureHeatmapLayer()?.clearLayers();
+};
+
+const renderHeatmap = () => {
+    const layer = ensureHeatmapLayer();
+
+    if (!layer) {
+        return;
+    }
+
+    clearHeatmap();
+
+    if (!heatmapSnapshot.value) {
+        syncLayerVisibility();
+
+        return;
+    }
+
+    heatmapSnapshot.value.points.forEach((point) => {
+        const fillColor = heatmapColor(point.intensity);
+        const radius = heatmapSnapshot.value!.cell_size_m * 0.75;
+
+        L.circle([point.lat, point.lng], {
+            radius,
+            color: fillColor,
+            weight: 1,
+            opacity: 0.7,
+            fillColor,
+            fillOpacity: 0.22 + point.intensity * 0.5,
+        })
+            .bindPopup(
+                `
+                    <div style="display:grid;gap:4px;min-width:180px;">
+                        <div style="font-weight:600;">${heatmapMetricLabel.value}</div>
+                        <div><strong>${t('pages.zones.show.heatmap.popup.value')}:</strong> ${formatHeatmapValue(point.value)}</div>
+                        <div><strong>${t('pages.zones.show.heatmap.popup.samples')}:</strong> ${point.count}</div>
+                        <div><strong>${t('pages.zones.show.heatmap.popup.recorded_at')}:</strong> ${point.recorded_at ?? '—'}</div>
+                    </div>
+                `,
+            )
+            .addTo(layer);
+    });
+
+    syncLayerVisibility();
+};
+
+const refreshHeatmapSnapshot = async () => {
+    isHeatmapLoading.value = true;
+    heatmapError.value = null;
+
+    try {
+        const params = new URLSearchParams({
+            metric: heatmapMetric.value,
+        });
+        const response = await fetch(
+            `/zones/${zoneData.value.id}/heatmap?${params.toString()}`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                },
+            },
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch heatmap snapshot.');
+        }
+
+        heatmapSnapshot.value = (await response.json()).data as HeatmapSnapshot;
+        isHeatmapStale.value = false;
+        renderHeatmap();
+    } catch {
+        heatmapError.value = t('pages.zones.show.heatmap.fetch_error');
+        heatmapSnapshot.value = null;
+        clearHeatmap();
+    } finally {
+        isHeatmapLoading.value = false;
+    }
 };
 
 const initializeMap = () => {
@@ -297,15 +547,15 @@ const initializeMap = () => {
 
         const marker = L.marker([Number(robot.lat), Number(robot.lng)], {
             icon: robotMarkerIcon(robot),
-        })
-            .addTo(map!)
-            .bindPopup(buildPopupContent(robot));
+        }).bindPopup(buildPopupContent(robot));
 
         marker.on('click', () => focusRobot(robot.id));
         markerLayers.set(robot.id, marker);
     });
 
+    renderHeatmap();
     refreshPolylineStyles();
+    syncLayerVisibility();
 };
 
 const handleRealtimeEvent = (event: {
@@ -315,6 +565,7 @@ const handleRealtimeEvent = (event: {
     const { telemetry_log: log, robot } = event;
 
     realtimeLogs.value = [log, ...realtimeLogs.value].slice(0, 100);
+    isHeatmapStale.value = true;
 
     robotPatches.value = new Map(robotPatches.value).set(robot.id, {
         lat: robot.lat,
@@ -328,11 +579,12 @@ const handleRealtimeEvent = (event: {
 
     const newLatLng: L.LatLngTuple = [robot.lat, robot.lng];
     const patchedRobot = {
-        ...robotsData.value.find((r) => r.id === robot.id)!,
+        ...robotsData.value.find((r) => r.id === robot.id),
         ...robot,
-    };
+    } as Robot;
 
     const marker = markerLayers.get(robot.id);
+
     if (marker && map) {
         marker.setLatLng(newLatLng);
         marker.setIcon(robotMarkerIcon(patchedRobot));
@@ -340,6 +592,7 @@ const handleRealtimeEvent = (event: {
     }
 
     const cachedPath = pathCache.get(robot.id);
+
     if (cachedPath) {
         const updated = [...cachedPath, newLatLng];
         pathCache.set(robot.id, updated);
@@ -363,6 +616,7 @@ onBeforeUnmount(() => {
     map?.remove();
     map = null;
     zoneLayer = null;
+    heatmapLayer = null;
     markerLayers.clear();
     pathLayers.clear();
     pathCache.clear();
@@ -370,6 +624,34 @@ onBeforeUnmount(() => {
 
 watch(selectedRobotId, () => {
     refreshPolylineStyles();
+});
+
+watch(mapMode, async (mode) => {
+    syncLayerVisibility();
+
+    if (mode === 'paths' && selectedRobotId.value != null) {
+        await fetchPath(selectedRobotId.value);
+    }
+
+    if (
+        mode === 'heatmap' &&
+        !heatmapSnapshot.value &&
+        !isHeatmapLoading.value
+    ) {
+        await refreshHeatmapSnapshot();
+    }
+});
+
+watch(heatmapMetric, (metric, prevMetric) => {
+    if (metric === prevMetric) {
+        return;
+    }
+
+    heatmapSnapshot.value = null;
+    heatmapError.value = null;
+    isHeatmapStale.value = true;
+    clearHeatmap();
+    syncLayerVisibility();
 });
 </script>
 
@@ -387,10 +669,156 @@ watch(selectedRobotId, () => {
                 <div
                     class="overflow-hidden rounded-xl border bg-card shadow-sm"
                 >
-                    <div
-                        ref="mapEl"
-                        class="min-h-[70vh] w-full xl:h-screen xl:max-h-[calc(100vh-10rem)]"
-                    />
+                    <div class="border-b px-4 py-4">
+                        <div class="space-y-4">
+                            <div class="flex flex-wrap gap-2">
+                                <Button
+                                    size="sm"
+                                    :variant="
+                                        mapMode === 'robots'
+                                            ? 'default'
+                                            : 'outline'
+                                    "
+                                    @click="mapMode = 'robots'"
+                                >
+                                    <Bot class="h-4 w-4" />
+                                    {{ t('pages.zones.show.map.modes.robots') }}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    :variant="
+                                        mapMode === 'paths'
+                                            ? 'default'
+                                            : 'outline'
+                                    "
+                                    @click="mapMode = 'paths'"
+                                >
+                                    <Route class="h-4 w-4" />
+                                    {{ t('pages.zones.show.map.modes.paths') }}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    :variant="
+                                        mapMode === 'heatmap'
+                                            ? 'default'
+                                            : 'outline'
+                                    "
+                                    @click="mapMode = 'heatmap'"
+                                >
+                                    <ThermometerSun class="h-4 w-4" />
+                                    {{
+                                        t('pages.zones.show.map.modes.heatmap')
+                                    }}
+                                </Button>
+                            </div>
+
+                            <p class="max-w-2xl text-sm text-muted-foreground">
+                                {{ mapDescription }}
+                            </p>
+
+                            <div
+                                v-if="mapMode === 'heatmap'"
+                                class="relative z-[1200] border-t border-dashed pt-4"
+                            >
+                                <div
+                                    class="flex flex-col gap-3 sm:flex-row sm:items-center"
+                                >
+                                    <Select v-model="heatmapMetric">
+                                        <SelectTrigger
+                                            class="w-full sm:max-w-md sm:min-w-72"
+                                        >
+                                            <SelectValue
+                                                :placeholder="
+                                                    t(
+                                                        'pages.zones.show.heatmap.metric_placeholder',
+                                                    )
+                                                "
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent class="z-[1300]">
+                                            <SelectItem
+                                                v-for="metric in HEATMAP_METRIC_KEYS"
+                                                :key="metric"
+                                                :value="metric"
+                                            >
+                                                {{
+                                                    t(
+                                                        `pages.telemetry_logs.metrics.${metric}.label`,
+                                                    )
+                                                }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <Button
+                                        :variant="
+                                            !heatmapSnapshot || isHeatmapStale
+                                                ? 'destructive'
+                                                : 'default'
+                                        "
+                                        :disabled="isHeatmapLoading"
+                                        @click="refreshHeatmapSnapshot"
+                                    >
+                                        <RefreshCw
+                                            class="h-4 w-4"
+                                            :class="{
+                                                'animate-spin':
+                                                    isHeatmapLoading,
+                                            }"
+                                        />
+                                        {{
+                                            t(
+                                                'pages.zones.show.heatmap.refresh',
+                                            )
+                                        }}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <div
+                            ref="mapEl"
+                            class="min-h-[70vh] w-full xl:h-screen xl:max-h-[calc(100vh-10rem)]"
+                        />
+
+                        <div
+                            v-if="
+                                mapMode === 'heatmap' &&
+                                heatmapSnapshot &&
+                                heatmapSnapshot.stats.min != null &&
+                                heatmapSnapshot.stats.max != null
+                            "
+                            class="pointer-events-none absolute bottom-4 left-4 z-[500] rounded-lg border bg-white/95 px-3 py-2 shadow-sm"
+                        >
+                            <div class="mb-2 flex items-center gap-2 text-xs">
+                                <MapIcon class="h-3.5 w-3.5 text-slate-500" />
+                                <span class="font-medium">
+                                    {{ t('pages.zones.show.heatmap.legend') }}
+                                </span>
+                            </div>
+                            <div class="heatmap-legend-gradient" />
+                            <div
+                                class="mt-2 flex items-center justify-between gap-6 text-[11px] text-slate-600"
+                            >
+                                <span>
+                                    {{
+                                        formatHeatmapValue(
+                                            heatmapSnapshot.stats.min,
+                                        )
+                                    }}
+                                </span>
+                                <span>
+                                    {{
+                                        formatHeatmapValue(
+                                            heatmapSnapshot.stats.max,
+                                        )
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -414,7 +842,7 @@ watch(selectedRobotId, () => {
                                 ? 'border-primary bg-primary/5'
                                 : 'border-border'
                         "
-                        @click="focusRobot(robot.id, true)"
+                        @click="focusRobot(robot.id, true, true)"
                     >
                         <div class="min-w-0">
                             <p class="truncate font-medium">
@@ -531,5 +959,18 @@ watch(selectedRobotId, () => {
     border-color: rgb(13 148 136);
     box-shadow: 0 12px 30px rgb(13 148 136 / 0.24);
     transform: translateY(-2px);
+}
+
+.heatmap-legend-gradient {
+    height: 0.6rem;
+    width: 13rem;
+    border-radius: 9999px;
+    background: linear-gradient(
+        90deg,
+        hsl(210 88% 62%) 0%,
+        hsl(150 88% 52%) 35%,
+        hsl(50 95% 54%) 68%,
+        hsl(0 88% 38%) 100%
+    );
 }
 </style>
